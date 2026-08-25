@@ -8,7 +8,7 @@ import catLgs from "@/assets/cat-lgs.jpg";
 import catSalon from "@/assets/cat-salon.jpg";
 import storeShelf from "@/assets/store-shelf.jpg";
 import lgsCampaign from "@/assets/lgs-campaign.jpg";
-import heroFestive from "@/assets/hero-festive.jpg";
+import heroFestive from "@/assets/hero_festive.png";
 
 export type Category = {
   slug: string;

@@ -33,10 +33,10 @@ import {
 } from "@/data/catalog";
 import { ShopProvider, useShop } from "@/lib/shop-store";
 import heroGlow from "@/assets/hero-glow.jpg";
-import heroLgs from "@/assets/hero-lgs.jpg";
+import heroLgs from "@/assets/carousel-3.png";
 import heroSalon from "@/assets/hero-salon.jpg";
-import heroFestive from "@/assets/hero-festive.jpg";
-import promo from "@/assets/promo-editorial.jpg";
+import heroFestive from "@/assets/hero_festive.png";
+import promo from "@/assets/LCS_banner.png";
 import lgsCampaign from "@/assets/lgs-campaign.jpg";
 import storeFront from "@/assets/store-front.jpg";
 import storeInterior from "@/assets/store-interior.jpg";
@@ -395,7 +395,7 @@ export function HomePage() {
         sub="The beauty favourites customers return for."
         list={byTag("bestseller").slice(0, 6)}
       />
-      <section className="container-lv py-8">
+      <section className="w-full py-8">
         <div className="relative min-h-[440px] overflow-hidden">
           <img
             src={promo}
