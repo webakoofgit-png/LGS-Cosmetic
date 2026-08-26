@@ -10,7 +10,7 @@ import {
 import { toast } from "sonner";
 import { products, type Product } from "@/data/catalog";
 
-export type CartLine = { id: string; qty: number; shade?: string | undefined };
+export type CartLine = { id: string; qty: number; shade?: string | undefined; variant?: string | undefined };
 
 type ShopState = {
   cart: CartLine[];
@@ -21,10 +21,10 @@ type ShopState = {
   setSearchOpen: (v: boolean) => void;
   addToCart: (
     product: Product,
-    opts?: { qty?: number; shade?: string | undefined; silent?: boolean },
+    opts?: { qty?: number; shade?: string | undefined; variant?: string | undefined; silent?: boolean },
   ) => void;
-  removeFromCart: (id: string, shade?: string | undefined) => void;
-  setQty: (id: string, qty: number, shade?: string | undefined) => void;
+  removeFromCart: (id: string, shade?: string | undefined, variant?: string | undefined) => void;
+  setQty: (id: string, qty: number, shade?: string | undefined, variant?: string | undefined) => void;
   toggleWishlist: (product: Product) => void;
   isWishlisted: (id: string) => boolean;
   cartCount: number;
@@ -73,27 +73,29 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const addToCart = useCallback<ShopState["addToCart"]>((product, opts) => {
     const qty = opts?.qty ?? 1;
     setCart((prev) => {
-      const idx = prev.findIndex((l) => l.id === product.id && l.shade === opts?.shade);
+      const idx = prev.findIndex(
+        (l) => l.id === product.id && l.shade === opts?.shade && l.variant === opts?.variant,
+      );
       const existing = prev[idx];
       if (existing) {
         const next = [...prev];
         next[idx] = { ...existing, qty: existing.qty + qty };
         return next;
       }
-      return [...prev, { id: product.id, qty, shade: opts?.shade }];
+      return [...prev, { id: product.id, qty, shade: opts?.shade, variant: opts?.variant }];
     });
     if (!opts?.silent) toast.success("Added to bag", { description: product.name });
   }, []);
 
-  const removeFromCart = useCallback((id: string, shade?: string | undefined) => {
-    setCart((prev) => prev.filter((l) => !(l.id === id && l.shade === shade)));
+  const removeFromCart = useCallback((id: string, shade?: string | undefined, variant?: string | undefined) => {
+    setCart((prev) => prev.filter((l) => !(l.id === id && l.shade === shade && l.variant === variant)));
   }, []);
 
-  const setQty = useCallback((id: string, qty: number, shade?: string | undefined) => {
+  const setQty = useCallback((id: string, qty: number, shade?: string | undefined, variant?: string | undefined) => {
     setCart((prev) =>
       qty <= 0
-        ? prev.filter((l) => !(l.id === id && l.shade === shade))
-        : prev.map((l) => (l.id === id && l.shade === shade ? { ...l, qty } : l)),
+        ? prev.filter((l) => !(l.id === id && l.shade === shade && l.variant === variant))
+        : prev.map((l) => (l.id === id && l.shade === shade && l.variant === variant ? { ...l, qty } : l)),
     );
   }, []);
 
@@ -124,7 +126,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       toggleWishlist,
       isWishlisted: (id: string) => wishlist.includes(id),
       cartCount: cart.reduce((n, l) => n + l.qty, 0),
-      subtotal: lines.reduce((n, l) => n + l.product.price * l.line.qty, 0),
+      subtotal: lines.reduce((n, l) => {
+        const linePrice =
+          l.product.variants?.find((v) => v.label === l.line.variant)?.price ?? l.product.price;
+        return n + linePrice * l.line.qty;
+      }, 0),
       lines,
     };
   }, [cart, wishlist, cartOpen, searchOpen, addToCart, removeFromCart, setQty, toggleWishlist]);

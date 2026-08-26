@@ -84,6 +84,46 @@ export const categories: Category[] = [
     group: "PROFESSIONAL",
     types: ["Salon Equipment", "Salon Chairs", "Hydra Facial Machines", "Wholesale Supplies"],
   },
+  {
+    slug: "hair-care",
+    name: "Hair Care",
+    tagline: "Shampoo, conditioner & serums",
+    image: catHair,
+    group: "SKINCARE",
+    types: ["Hair Care"],
+  },
+  {
+    slug: "skin-care",
+    name: "Skin Care",
+    tagline: "Daily face and skin care",
+    image: catSkincare,
+    group: "SKINCARE",
+    types: ["Skin Care"],
+  },
+  {
+    slug: "treatment-care",
+    name: "Treatment Care",
+    tagline: "Targeted skin routines",
+    image: catSkincare,
+    group: "SKINCARE",
+    types: ["Treatment Care"],
+  },
+  {
+    slug: "sun-care",
+    name: "Sun Care",
+    tagline: "Everyday sun protection",
+    image: catSkincare,
+    group: "SKINCARE",
+    types: ["Sun Care"],
+  },
+  {
+    slug: "face-care",
+    name: "Face Care",
+    tagline: "Gentle cleansing care",
+    image: catSkincare,
+    group: "SKINCARE",
+    types: ["Face Care"],
+  },
 ];
 
 export const categoryBySlug = (slug: string) => categories.find((c) => c.slug === slug);
@@ -103,6 +143,9 @@ export type Product = {
   image: string;
   hoverImage: string;
   shades?: { name: string; hex: string }[];
+  variants?: { label: string; size?: string; price: number; mrp?: number }[];
+  size?: string;
+  keyIngredients?: string[];
   tags: ("bestseller" | "new" | "trending" | "offer")[];
   inStock: boolean;
   description: string;
@@ -536,7 +579,398 @@ const seeds: Seed[] = [
   },
 ];
 
-export const products: Product[] = seeds.map((s, i) => {
+const lgsSeeds: Seed[] = [
+  {
+    name: "LGS Aloe Vera Shampoo",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "175 ml",
+    price: 369,
+    mrp: 369,
+    rating: 4.6,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "175 ml",
+    description:
+      "LGS Aloe Vera Shampoo is formulated to help cleanse the hair while supporting soft, healthy-looking and manageable hair.",
+    howToUse:
+      "Apply shampoo to wet hair, gently massage into the scalp and hair, then rinse thoroughly with water. Repeat if required.",
+    benefits: [
+      "Helps cleanse the hair and scalp.",
+      "Helps maintain softness and smoothness.",
+      "Suitable for regular hair-care routines.",
+    ],
+  },
+  {
+    name: "LGS Anti-Dandruff Shampoo",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "175 ml",
+    price: 369,
+    mrp: 369,
+    rating: 4.6,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "175 ml",
+    description:
+      "A hair-cleansing shampoo designed for dandruff-prone hair and scalp. It helps cleanse the scalp while supporting cleaner and healthier-looking hair.",
+    howToUse: "Apply to wet hair and scalp. Massage gently, leave for a short time and rinse thoroughly.",
+    benefits: [
+      "Helps cleanse dandruff-prone scalp.",
+      "Helps remove scalp impurities.",
+      "Supports clean and manageable hair.",
+    ],
+  },
+  {
+    name: "LGS Hair Tonic",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "175 ml",
+    price: 599,
+    mrp: 599,
+    rating: 4.6,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "175 ml",
+    description:
+      "LGS Hair Tonic is designed as part of a regular hair-care routine to support the appearance and condition of the hair and scalp.",
+    howToUse: "Apply the required quantity to the hair/scalp and massage gently as directed.",
+    benefits: [
+      "Supports scalp and hair care.",
+      "Helps maintain healthier-looking hair.",
+      "Suitable for regular hair-care routines.",
+    ],
+  },
+  {
+    name: "LGS Hair Conditioner",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "175 ml",
+    price: 369,
+    mrp: 369,
+    rating: 4.6,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "175 ml",
+    description:
+      "A conditioning formula designed to make hair feel softer, smoother and more manageable after shampooing.",
+    howToUse:
+      "After shampooing, apply conditioner through the hair. Leave for approximately 4 minutes and rinse thoroughly with water.",
+    benefits: [
+      "Helps soften the hair.",
+      "Supports smoother and manageable hair.",
+      "Helps improve the feel of dry or rough hair.",
+    ],
+  },
+  {
+    name: "LGS Jasmine Hair Oil",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "100 ml",
+    price: 299,
+    mrp: 299,
+    rating: 4.6,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "100 ml",
+    description:
+      "Jasmine Hair Oil is designed to nourish the hair and scalp as part of a regular hair-care routine.",
+    howToUse: "Apply an appropriate amount to the scalp and hair and massage gently.",
+    benefits: [
+      "Helps nourish the hair.",
+      "Supports healthier-looking hair.",
+      "Helps maintain the condition of the hair and scalp.",
+    ],
+  },
+  {
+    name: "LGS Hair Serum",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "50 ml / 100 ml",
+    price: 199,
+    mrp: 369,
+    rating: 4.6,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    variants: [
+      { label: "50 ml", size: "50 ml", price: 199, mrp: 199 },
+      { label: "100 ml", size: "100 ml", price: 369, mrp: 369 },
+    ],
+    description:
+      "LGS Hair Serum helps enhance the appearance of hair by supporting a smoother, shinier and more manageable finish.",
+    howToUse:
+      "Take a small amount of serum and apply evenly through the hair, particularly the lengths and ends.",
+    benefits: [
+      "Helps add shine to the hair.",
+      "Helps improve smoothness.",
+      "Makes hair easier to manage.",
+      "Suitable for finishing your hair-care routine.",
+    ],
+  },
+  {
+    name: "LGS Hair Growth Active Serum",
+    brand: "LGS",
+    category: "hair-care",
+    type: "Hair Care",
+    subtitle: "30 ml",
+    price: 1599,
+    mrp: 1599,
+    rating: 4.7,
+    reviews: 0,
+    image: catHair,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "30 ml",
+    description:
+      "LGS Hair Growth Active Serum is a specialized hair serum designed to support the appearance of stronger and healthier-looking hair.",
+    howToUse: "Apply the serum directly to the scalp as directed and massage gently.",
+    benefits: [
+      "Supports hair-care routines focused on hair growth.",
+      "Helps maintain healthier-looking hair.",
+      "Designed for targeted scalp application.",
+    ],
+  },
+  {
+    name: "LGS Fairness Instant Skin Glow Cream",
+    brand: "LGS",
+    category: "skin-care",
+    type: "Skin Care",
+    subtitle: "50 gm / 100 gm",
+    price: 249,
+    mrp: 499,
+    rating: 4.6,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    variants: [
+      { label: "50 gm", size: "50 gm", price: 249, mrp: 249 },
+      { label: "100 gm", size: "100 gm", price: 499, mrp: 499 },
+    ],
+    description:
+      "LGS Fairness Instant Skin Glow Cream is designed to support brighter, smoother and glowing-looking skin as part of your regular skincare routine.",
+    howToUse: "Apply an appropriate amount to clean skin and massage gently until absorbed.",
+    benefits: [
+      "Helps improve the appearance of skin glow.",
+      "Supports brighter-looking skin.",
+      "Helps maintain smooth-looking skin.",
+    ],
+  },
+  {
+    name: "LGS D-Tan",
+    brand: "LGS",
+    category: "treatment-care",
+    type: "Treatment Care",
+    subtitle: "100 gm / 250 gm",
+    price: 369,
+    mrp: 699,
+    rating: 4.6,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    variants: [
+      { label: "100 gm", size: "100 gm", price: 369, mrp: 369 },
+      { label: "250 gm", size: "250 gm", price: 699, mrp: 699 },
+    ],
+    description:
+      "LGS D-Tan is a treatment-care product designed to help improve the appearance of tanned and dull-looking skin.",
+    howToUse:
+      "Apply an even layer to clean skin as directed. Leave it on for the recommended duration and remove/rinse gently.",
+    benefits: [
+      "Helps reduce the appearance of tanning.",
+      "Supports brighter-looking skin.",
+      "Helps improve dull-looking skin.",
+    ],
+  },
+  {
+    name: "LGS Anti-Ageing Cream",
+    brand: "LGS",
+    category: "treatment-care",
+    type: "Treatment Care",
+    subtitle: "50 gm",
+    price: 369,
+    mrp: 369,
+    rating: 4.5,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "50 gm",
+    description:
+      "LGS Anti-Ageing Cream is formulated to support mature skin and help improve the appearance of visible signs of ageing.",
+    howToUse: "Apply to clean skin and massage gently until absorbed.",
+    benefits: [
+      "Helps improve the appearance of fine lines and wrinkles.",
+      "Supports smoother-looking skin.",
+      "Helps maintain a youthful-looking complexion.",
+    ],
+  },
+  {
+    name: "LGS Anti-Blemish Pigmentation Cream",
+    brand: "LGS",
+    category: "treatment-care",
+    type: "Treatment Care",
+    subtitle: "50 gm",
+    price: 369,
+    mrp: 369,
+    rating: 4.5,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "50 gm",
+    keyIngredients: ["Tulsi", "Neem", "Aloe Vera"],
+    description:
+      "A targeted treatment-care cream formulated for skin affected by the appearance of blemishes and pigmentation.",
+    howToUse: "Apply a small amount to clean skin, focusing on the required areas, and massage gently.",
+    benefits: [
+      "Helps improve the appearance of blemishes.",
+      "Helps reduce the visible appearance of pigmentation.",
+      "Supports clearer and more even-looking skin.",
+    ],
+  },
+  {
+    name: "LGS Under Eye Gel",
+    brand: "LGS",
+    category: "treatment-care",
+    type: "Treatment Care",
+    subtitle: "50 gm",
+    price: 369,
+    mrp: 369,
+    rating: 4.5,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "50 gm",
+    keyIngredients: ["Carrot Oil", "Aloe Vera"],
+    description:
+      "LGS Under Eye Gel is specially formulated for the delicate under-eye area and helps improve the appearance of tired-looking skin around the eyes.",
+    howToUse:
+      "Take a small quantity and gently apply around the under-eye area. Avoid direct contact with the eyes.",
+    benefits: [
+      "Helps care for the delicate under-eye area.",
+      "Helps improve the appearance of tired-looking eyes.",
+      "Supports a fresher-looking eye area.",
+    ],
+  },
+  {
+    name: "LGS Acne Pimple Removal Cream",
+    brand: "LGS",
+    category: "treatment-care",
+    type: "Treatment Care",
+    subtitle: "50 gm",
+    price: 369,
+    mrp: 369,
+    rating: 4.5,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "50 gm",
+    keyIngredients: ["Tea Tree Oil", "Aloe Vera"],
+    description:
+      "LGS Acne Pimple Removal Cream is designed as targeted care for acne and pimple-prone skin.",
+    howToUse: "Clean the skin thoroughly and apply a small amount to the required area as directed.",
+    benefits: [
+      "Helps care for acne and pimple-prone skin.",
+      "Supports clearer-looking skin.",
+      "Designed for targeted skincare application.",
+    ],
+  },
+  {
+    name: "LGS Sunscreen Lotion SPF 50",
+    brand: "LGS",
+    category: "sun-care",
+    type: "Sun Care",
+    subtitle: "100 gm",
+    price: 299,
+    mrp: 299,
+    rating: 4.6,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "100 gm",
+    description:
+      "LGS Sunscreen Lotion SPF 50 helps protect the skin from harmful UVA and UVB rays during sun exposure.",
+    howToUse: "Apply evenly to exposed skin before going out in the sun. Reapply when required.",
+    benefits: [
+      "SPF 50 sun protection.",
+      "Helps protect skin from UVA and UVB exposure.",
+      "Suitable for use before outdoor activities.",
+    ],
+  },
+  {
+    name: "LGS Lemon Face Wash Gel",
+    brand: "LGS",
+    category: "face-care",
+    type: "Face Care",
+    subtitle: "100 ml",
+    price: 299,
+    mrp: 299,
+    rating: 4.5,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "100 ml",
+    description:
+      "LGS Lemon Face Wash Gel is a refreshing facial cleanser designed to remove everyday dirt and impurities while leaving the skin feeling clean and fresh.",
+    howToUse:
+      "Wet the face, take a small quantity of face wash and gently massage over the face. Rinse thoroughly with water.",
+    benefits: [
+      "Helps cleanse dirt and impurities.",
+      "Refreshes the skin.",
+      "Supports clean and fresh-looking skin.",
+    ],
+  },
+  {
+    name: "LGS Neem Face Wash Gel",
+    brand: "LGS",
+    category: "face-care",
+    type: "Face Care",
+    subtitle: "100 ml",
+    price: 299,
+    mrp: 299,
+    rating: 4.5,
+    reviews: 0,
+    image: catSkincare,
+    hoverImage: lgsCampaign,
+    tags: ["new"],
+    size: "100 ml",
+    description:
+      "LGS Neem Face Wash Gel is designed to cleanse the skin and remove accumulated dirt and impurities for a cleaner, fresher appearance.",
+    howToUse:
+      "Wet the face, gently massage the face wash over the skin and rinse thoroughly with water.",
+    benefits: [
+      "Helps cleanse the skin.",
+      "Removes everyday dirt and impurities.",
+      "Helps maintain fresh and clean-looking skin.",
+    ],
+  },
+];
+
+const normalizeProduct = (s: Seed, i: number): Product => {
   const cat = categoryBySlug(s.category);
   return {
     ...s,
@@ -561,7 +995,9 @@ export const products: Product[] = seeds.map((s, i) => {
       "Price inclusive of all taxes",
     ],
   };
-});
+};
+
+export const products: Product[] = [...seeds, ...lgsSeeds].map(normalizeProduct);
 
 export const productBySlug = (slug: string) => products.find((p) => p.slug === slug);
 export const byTag = (tag: Product["tags"][number]) => products.filter((p) => p.tags.includes(tag));

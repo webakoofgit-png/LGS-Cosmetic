@@ -10,7 +10,7 @@ export const site = {
   phones: ["+917507055139", "+919067634555"],
   phonesDisplay: ["+91 75070 55139", "+91 90676 34555"],
   whatsapp: "917507055139",
-  instagram: "https://www.instagram.com/lucky_varieties_beauty_mall/",
+  instagram: "https://www.instagram.com/lucky_varieties_beauty_mall?igsi=MTl2a3JjMzhmaXli",
   instagramHandle: "@lucky_varieties_beauty_mall",
   mapsQuery:
     "Lucky+Varieties+Beauty+Mall,+Rahimatpur+Road,+Near+Bank+of+India,+Koregaon,+Satara,+Maharashtra",

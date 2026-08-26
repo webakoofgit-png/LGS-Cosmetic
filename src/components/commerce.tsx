@@ -8,6 +8,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ArrowUp,
   Instagram,
   MapPin,
   Phone,
@@ -18,6 +19,8 @@ import {
   Star,
   ShieldCheck,
   BadgeCheck,
+  Facebook,
+  Youtube,
   type LucideIcon,
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
@@ -25,6 +28,7 @@ import { announcements, formatINR, mapsUrl, site, whatsappUrl } from "@/data/sit
 import {
   beautyNeeds,
   byTag,
+  categoryBySlug,
   categories,
   discountOf,
   products,
@@ -38,6 +42,7 @@ import heroSalon from "@/assets/hero-salon.jpg";
 import heroFestive from "@/assets/hero_festive.png";
 import promo from "@/assets/LCS_banner.png";
 import lgsCampaign from "@/assets/lgs-campaign.jpg";
+import lgsLogo from "@/assets/lgs_logo.png";
 import storeFront from "@/assets/store-front.jpg";
 import storeInterior from "@/assets/store-interior.jpg";
 import storeShelf from "@/assets/store-shelf.jpg";
@@ -65,14 +70,82 @@ export function AppShell({ children }: { children: ReactNode }) {
       <CartDrawer />
       <SearchOverlay />
       <Toaster position="top-center" richColors />
-      <a
-        href={whatsappUrl}
-        aria-label="Chat on WhatsApp"
-        className="fixed bottom-5 right-4 z-40 grid size-12 place-items-center rounded-full bg-[#218c55] text-white shadow-lg transition hover:scale-105"
-      >
-        <MessageCircle size={22} />
-      </a>
+      <SocialFloatingButtons />
     </ShopProvider>
+  );
+}
+
+function SocialFloatingButtons() {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <div className="fixed bottom-5 right-4 z-40 flex flex-col items-end gap-3">
+      {open && (
+        <div className="flex flex-col items-end gap-3">
+          <a
+            href={site.instagram}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Instagram"
+            className="grid size-10 place-items-center rounded-full bg-[#f95b9c] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] transition hover:scale-105"
+          >
+            <Instagram size={15} strokeWidth={2.4} />
+          </a>
+          <button
+            type="button"
+            aria-label="Facebook link coming soon"
+            className="grid size-10 place-items-center rounded-full bg-[#4c6faf] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
+          >
+            <Facebook size={15} strokeWidth={2.4} />
+          </button>
+          <button
+            type="button"
+            aria-label="YouTube link coming soon"
+            className="grid size-10 place-items-center rounded-full bg-[#ea4335] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
+          >
+            <Youtube size={15} strokeWidth={2.4} />
+          </button>
+          <button
+            type="button"
+            aria-label="WhatsApp link coming soon"
+            className="grid size-10 place-items-center rounded-full bg-[#25d366] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
+          >
+            <WhatsAppGlyph />
+          </button>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-label={open ? "Hide social icons" : "Show social icons"}
+        className="grid size-8 place-items-center rounded-full bg-white text-[#21b6da] shadow-[0_8px_14px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition hover:scale-105"
+      >
+        <X size={15} strokeWidth={2.4} className={open ? "" : "rotate-45"} />
+      </button>
+      <button
+        type="button"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Back to top"
+        className="grid size-10 place-items-center rounded-full bg-gold text-wine-deep shadow-[0_10px_18px_rgba(0,0,0,0.18)] transition hover:scale-105"
+      >
+        <ArrowUp size={16} strokeWidth={2.6} />
+      </button>
+    </div>
+  );
+}
+
+function WhatsAppGlyph() {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className="size-[17px]">
+      <path
+        fill="currentColor"
+        d="M19.11 17.23c-.28-.14-1.65-.81-1.9-.9-.26-.1-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.44-2.25-1.4-.83-.74-1.38-1.67-1.54-1.95-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.19-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.54-.46-.47-.63-.48l-.53-.01c-.18 0-.49.07-.75.35-.26.28-1.01.99-1.01 2.42 0 1.42 1.03 2.79 1.17 2.98.14.19 2.04 3.11 4.94 4.36.69.29 1.23.46 1.65.59.69.22 1.31.19 1.8.12.55-.08 1.65-.67 1.88-1.32.23-.65.23-1.21.16-1.32-.07-.11-.26-.18-.54-.32z"
+      />
+      <path
+        fill="currentColor"
+        d="M16.04 2.67c-7.35 0-13.33 5.98-13.33 13.33 0 2.35.62 4.64 1.8 6.66L3 29.33l6.86-1.79a13.28 13.28 0 0 0 6.18 1.53h.01c7.35 0 13.33-5.98 13.33-13.33S23.39 2.67 16.04 2.67zm0 24.1h-.01a11.7 11.7 0 0 1-5.97-1.63l-.43-.25-4.07 1.06 1.09-3.96-.28-.41a11.7 11.7 0 1 1 9.67 5.19z"
+      />
+    </svg>
   );
 }
 
@@ -98,13 +171,12 @@ function Header() {
           >
             <Menu />
           </button>
-          <a href="/" className="min-w-fit text-center leading-none">
-            <span className="block font-display text-2xl font-bold tracking-[.08em] text-wine sm:text-3xl">
-              LUCKY
-            </span>
-            <span className="mt-1 block text-[8px] font-semibold tracking-[.24em] text-gold">
-              VARIETIES BEAUTY MALL
-            </span>
+          <a href="/" className="min-w-fit" aria-label="Lucky Varieties Beauty Mall home">
+            <img
+              src={lgsLogo}
+              alt="Lucky Varieties Beauty Mall"
+              className="h-11 w-auto sm:h-12 lg:h-14"
+            />
           </a>
           <button
             onClick={() => setSearchOpen(true)}
@@ -205,6 +277,9 @@ function Count({ n }: { n: number }) {
 
 export function ProductCard({ p }: { p: Product }) {
   const { addToCart, toggleWishlist, isWishlisted } = useShop();
+  const catName = categoryBySlug(p.category)?.name ?? p.type;
+  const hasVariants = Boolean(p.variants?.length);
+  const startingPrice = hasVariants ? Math.min(...(p.variants ?? []).map((v) => v.price)) : p.price;
   return (
     <article className="group min-w-0 bg-white">
       <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
@@ -235,7 +310,7 @@ export function ProductCard({ p }: { p: Product }) {
       </div>
       <div className="p-3 sm:p-4">
         <p className="text-[9px] font-bold uppercase tracking-[.16em] text-muted-foreground">
-          {p.brand}
+          {p.brand} · {catName}
         </p>
         <a
           href={`/product/${p.slug}`}
@@ -243,14 +318,21 @@ export function ProductCard({ p }: { p: Product }) {
         >
           {p.name}
         </a>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          {hasVariants ? `From ${formatINR(startingPrice)}` : p.size ? p.size : p.subtitle}
+        </p>
         <div className="mt-1 flex items-center gap-1 text-[11px]">
           <Star size={12} className="fill-gold text-gold" />
           {p.rating} <span className="text-muted-foreground">({p.reviews})</span>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-          <b>{formatINR(p.price)}</b>
-          <s className="text-xs text-muted-foreground">{formatINR(p.mrp)}</s>
-          <span className="text-[10px] font-bold text-sale">{discountOf(p)}% OFF</span>
+          <b>{hasVariants ? `From ${formatINR(startingPrice)}` : formatINR(p.price)}</b>
+          {!hasVariants && (
+            <>
+              <s className="text-xs text-muted-foreground">{formatINR(p.mrp)}</s>
+              <span className="text-[10px] font-bold text-sale">{discountOf(p)}% OFF</span>
+            </>
+          )}
         </div>
         <button
           onClick={() => addToCart(p)}
@@ -956,7 +1038,9 @@ function Footer() {
     <footer className="overflow-hidden bg-wine-deep text-white">
       <div className="container-lv grid min-w-0 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <p className="font-display text-3xl font-bold tracking-wider">LUCKY</p>
+          <a href="/" className="inline-flex" aria-label="Lucky Varieties Beauty Mall home">
+            <img src={lgsLogo} alt="Lucky Varieties Beauty Mall" className="h-14 w-auto" />
+          </a>
           <p className="mt-3 max-w-[330px] text-sm leading-6 text-white/60 sm:max-w-sm">
             Premium beauty products for everyday glow. Beauty, personal care, jewellery and
             professional salon solutions in Koregaon.
@@ -983,7 +1067,10 @@ function Footer() {
         ))}
       </div>
       <div className="border-t border-white/10 py-5 text-center text-[10px] tracking-wide text-white/45">
-        © {new Date().getFullYear()} Lucky Varieties Beauty Mall. All Rights Reserved.
+        © 2026 All Rights Reserved By Lucky Varieties Beauty Mall and Designed By{" "}
+        <a href="https://webakoof.com/" className="text-white/70 underline underline-offset-2 hover:text-white">
+          Webakoof
+        </a>
       </div>
     </footer>
   );
@@ -1301,33 +1388,37 @@ function CartDrawer() {
             </div>
           ) : (
             lines.map(({ line, product }) => (
-              <div className="flex gap-4 border-b py-4" key={product.id + line.shade}>
+              <div className="flex gap-4 border-b py-4" key={`${product.id}-${line.shade ?? "default"}-${line.variant ?? "default"}`}>
                 <img src={product.image} alt="" className="size-24 object-cover" />
                 <div className="min-w-0 flex-1">
                   <p className="font-display text-lg">{product.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {line.shade || product.subtitle.replace("Â·", "·")}
+                    {line.variant || line.shade || product.subtitle}
                   </p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-center border">
                       <button
-                        onClick={() => setQty(product.id, line.qty - 1, line.shade)}
+                        onClick={() => setQty(product.id, line.qty - 1, line.shade, line.variant)}
                         className="grid size-8 place-items-center"
                       >
                         <Minus size={13} />
                       </button>
                       <span className="w-7 text-center text-xs">{line.qty}</span>
                       <button
-                        onClick={() => setQty(product.id, line.qty + 1, line.shade)}
+                        onClick={() => setQty(product.id, line.qty + 1, line.shade, line.variant)}
                         className="grid size-8 place-items-center"
                       >
                         <Plus size={13} />
                       </button>
                     </div>
-                    <b className="text-sm">{formatINR(product.price * line.qty)}</b>
+                    <b className="text-sm">
+                      {formatINR((product.variants?.find((v) => v.label === line.variant)?.price ?? product.price) *
+                          line.qty,
+                      )}
+                    </b>
                   </div>
                   <button
-                    onClick={() => removeFromCart(product.id, line.shade)}
+                    onClick={() => removeFromCart(product.id, line.shade, line.variant)}
                     className="mt-2 text-[10px] underline"
                   >
                     Remove
@@ -1446,8 +1537,16 @@ export function ProductPage({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, isWishlisted } = useShop();
   const [qty, setQty] = useState(1),
     [shade, setShade] = useState(product.shades?.[0]?.name),
+    [variant, setVariant] = useState(product.variants?.[0]?.label),
     [selectedImage, setSelectedImage] = useState(product.image);
   const galleryImages = Array.from(new Set([product.image, product.hoverImage]));
+  const selectedVariant = product.variants?.find((v) => v.label === variant) ?? product.variants?.[0];
+  const activePrice = selectedVariant?.price ?? product.price;
+  const activeMrp = selectedVariant?.mrp ?? product.mrp;
+  const currentDetails = [
+    ...product.details,
+    ...(product.keyIngredients ? [`Key Ingredients: ${product.keyIngredients.join(", ")}`] : []),
+  ];
   return (
     <div className="container-lv py-8">
       <div className="grid gap-8 md:grid-cols-2 md:gap-6 lg:gap-8">
@@ -1490,11 +1589,38 @@ export function ProductPage({ product }: { product: Product }) {
             {product.rating} ({product.reviews} reviews)
           </div>
           <div className="mt-6 flex items-center gap-3">
-            <b className="text-2xl">{formatINR(product.price)}</b>
-            <s className="text-muted-foreground">{formatINR(product.mrp)}</s>
-            <span className="font-bold text-sale">{discountOf(product)}% OFF</span>
+            <b className="text-2xl">{formatINR(activePrice)}</b>
+            {activeMrp > activePrice && (
+              <>
+                <s className="text-muted-foreground">{formatINR(activeMrp)}</s>
+                <span className="font-bold text-sale">
+                  {Math.round(((activeMrp - activePrice) / activeMrp) * 100)}% OFF
+                </span>
+              </>
+            )}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Inclusive of all taxes</p>
+          {product.variants && (
+            <div className="mt-7">
+              <p className="text-xs font-bold uppercase tracking-wider">Select Size</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {product.variants.map((v) => (
+                  <button
+                    key={v.label}
+                    type="button"
+                    onClick={() => setVariant(v.label)}
+                    className={`min-h-10 rounded-full border px-4 text-xs font-bold transition ${
+                      variant === v.label
+                        ? "border-wine bg-wine text-white"
+                        : "border-border bg-white text-foreground hover:border-wine"
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {product.shades && (
             <div className="mt-7">
               <p className="text-xs font-bold uppercase tracking-wider">Shade: {shade}</p>
@@ -1526,7 +1652,7 @@ export function ProductPage({ product }: { product: Product }) {
               </button>
             </div>
             <button
-              onClick={() => addToCart(product, { qty, shade })}
+              onClick={() => addToCart(product, { qty, shade, variant })}
               className="min-h-13 min-w-[150px] flex-1 bg-wine text-xs font-bold tracking-widest text-white"
             >
               ADD TO BAG
@@ -1540,7 +1666,7 @@ export function ProductPage({ product }: { product: Product }) {
           </div>
           <button
             onClick={() => {
-              addToCart(product, { qty, shade });
+              addToCart(product, { qty, shade, variant });
               location.href = "/checkout";
             }}
             className="mt-3 h-13 w-full bg-gold text-xs font-bold tracking-widest text-wine-deep"
@@ -1570,6 +1696,28 @@ export function ProductPage({ product }: { product: Product }) {
               <h3 className="text-xl">Key Benefits</h3>
               <ul className="mt-2 list-inside list-disc text-sm leading-7 text-muted-foreground">
                 {product.benefits.map((x) => (
+                  <li key={x}>{x}</li>
+                ))}
+              </ul>
+            </div>
+            {product.keyIngredients && (
+              <div>
+                <h3 className="text-xl">Key Ingredients</h3>
+                <ul className="mt-2 list-inside list-disc text-sm leading-7 text-muted-foreground">
+                  {product.keyIngredients.map((x) => (
+                    <li key={x}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div>
+              <h3 className="text-xl">How to Use</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">{product.howToUse}</p>
+            </div>
+            <div>
+              <h3 className="text-xl">Product Details</h3>
+              <ul className="mt-2 list-inside list-disc text-sm leading-7 text-muted-foreground">
+                {currentDetails.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ul>
@@ -1741,7 +1889,7 @@ export function CheckoutPage() {
                     <div className="flex items-center border">
                       <button
                         type="button"
-                        onClick={() => setQty(product.id, line.qty - 1, line.shade)}
+                        onClick={() => setQty(product.id, line.qty - 1, line.shade, line.variant)}
                         className="grid size-7 place-items-center"
                       >
                         <Minus size={12} />
@@ -1749,7 +1897,7 @@ export function CheckoutPage() {
                       <span className="w-6 text-center text-[11px]">{line.qty}</span>
                       <button
                         type="button"
-                        onClick={() => setQty(product.id, line.qty + 1, line.shade)}
+                        onClick={() => setQty(product.id, line.qty + 1, line.shade, line.variant)}
                         className="grid size-7 place-items-center"
                       >
                         <Plus size={12} />
@@ -1759,7 +1907,7 @@ export function CheckoutPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => removeFromCart(product.id, line.shade)}
+                    onClick={() => removeFromCart(product.id, line.shade, line.variant)}
                     className="mt-2 text-[10px] underline"
                   >
                     Remove

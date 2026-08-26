@@ -6,7 +6,7 @@
 
 /*
  * Lucky Varieties Beauty Mall — design system
- * Palette: deep maroon / wine, rich red, premium gold, warm ivory, charcoal.
+ * Palette: bold red, premium gold, warm ivory, charcoal.
  * All colors are oklch semantic tokens. Never hardcode colors in components.
  */
 
@@ -69,8 +69,8 @@
   --radius: 0.25rem;
 
   --ivory: oklch(0.981 0.009 84);
-  --wine: oklch(0.34 0.115 18);
-  --wine-deep: oklch(0.26 0.09 18);
+  --wine: #db0107;
+  --wine-deep: color-mix(in oklab, var(--wine) 78%, black);
   --rose: oklch(0.53 0.19 22);
   --gold: oklch(0.74 0.113 82);
   --gold-soft: oklch(0.9 0.05 86);
