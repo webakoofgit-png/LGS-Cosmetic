@@ -2,21 +2,23 @@ export const site = {
   name: "Lucky Varieties Beauty Mall",
   shortName: "Lucky Varieties",
   ownBrand: "LGS",
-  tagline: "Premium beauty products for everyday glow",
+  tagline: "Skin and hair care for your skin",
   address: {
-    line1: "Rahimatpur Road, Near Bank of India",
-    line2: "Koregaon, Dist. Satara, Maharashtra",
+    line1: "Koregaon-Rahimatpur Rd, near Police Station",
+    line2: "Koregaon, Maharashtra 415501",
   },
-  phones: ["+917507055139", "+919067634555"],
-  phonesDisplay: ["+91 75070 55139", "+91 90676 34555"],
-  whatsapp: "917507055139",
-  instagram: "https://www.instagram.com/lucky_varieties_beauty_mall?igsi=MTl2a3JjMzhmaXli",
-  instagramHandle: "@lucky_varieties_beauty_mall",
+  phones: ["+919860964571"],
+  phonesDisplay: ["+91 98609 64571"],
+  whatsapp: "919860964571",
+  facebook: "https://www.facebook.com/lgscosmetics",
+  instagram: "https://www.instagram.com/lgscosmetics/",
+  instagramHandle: "@lgscosmetics",
+  mapsLink: "https://share.google/6fr8aVZz1wQB4cWsl",
   mapsQuery:
-    "Lucky+Varieties+Beauty+Mall,+Rahimatpur+Road,+Near+Bank+of+India,+Koregaon,+Satara,+Maharashtra",
+    "Lucky+Varieties+Beauty+Mall,+Koregaon-Rahimatpur+Road,+Near+Police+Station,+Koregaon,+Maharashtra+415501",
 } as const;
 
-export const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${site.mapsQuery}`;
+export const mapsUrl = site.mapsLink;
 export const mapsEmbedUrl = `https://www.google.com/maps?q=${site.mapsQuery}&output=embed`;
 export const whatsappUrl = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(
   "Hello Lucky Varieties Beauty Mall, I would like to know more about your products.",

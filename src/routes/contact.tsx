@@ -17,9 +17,11 @@ export const Route = createFileRoute("/contact")({
             {site.address.line2}
           </p>
           <p className="mt-5 leading-8">
-            <a href={`tel:${site.phones[0]}`}>{site.phonesDisplay[0]}</a>
-            <br />
-            <a href={`tel:${site.phones[1]}`}>{site.phonesDisplay[1]}</a>
+            {site.phones.map((phone, index) => (
+              <span key={phone} className="block">
+                <a href={`tel:${phone}`}>{site.phonesDisplay[index]}</a>
+              </span>
+            ))}
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <a href={mapsUrl} className="bg-wine px-5 py-4 text-xs font-bold text-white">

@@ -9,6 +9,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import { products, type Product } from "@/data/catalog";
+import { ADMIN_API_BASE, resolveImageUrl } from "@/lib/admin-api";
 
 export type CartLine = { id: string; qty: number; shade?: string | undefined; variant?: string | undefined };
 
@@ -42,6 +43,44 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [catalogVersion, refreshCatalog] = useState(0);
+  const [catalogReady, setCatalogReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`${ADMIN_API_BASE}/api/products?limit=100`)
+      .then((response) => response.json())
+      .then((payload) => {
+        if (!active || !Array.isArray(payload?.data)) return;
+        const remoteBySlug = new Map(payload.data.map((item: any) => [item.slug, item]));
+        products.forEach((product) => {
+          const remote = remoteBySlug.get(product.slug);
+          if (!remote) return;
+          const remoteMain = String(remote.mainImage ?? "");
+          // Seeded brochure paths belong to the bundled catalog; keep the
+          // imported asset instead of replacing it with a non-existent URL.
+          const image = remoteMain && !remoteMain.startsWith("/assets/")
+            ? resolveImageUrl(remoteMain)
+            : product.image;
+          const gallery = parseRemoteList(remote.additionalImages);
+          product.image = image;
+          product.hoverImage = gallery[0] ? resolveImageUrl(gallery[0]) : image;
+          product.galleryImages = gallery
+            .filter((item: string) => !item.startsWith("/assets/"))
+            .map((item: string) => resolveImageUrl(item));
+          product.stock = Number(remote.stock ?? product.stock ?? 0);
+          product.inStock = remote.status !== "Inactive" && Number(remote.stock ?? 0) > 0;
+          const remoteVariants = parseRemoteJson(remote.variants);
+          if (Array.isArray(remoteVariants) && remoteVariants.length) product.variants = remoteVariants;
+        });
+        refreshCatalog((value) => value + 1);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (active) setCatalogReady(true);
+      });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     try {
@@ -133,9 +172,25 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       }, 0),
       lines,
     };
-  }, [cart, wishlist, cartOpen, searchOpen, addToCart, removeFromCart, setQty, toggleWishlist]);
+  }, [cart, wishlist, cartOpen, searchOpen, catalogVersion, addToCart, removeFromCart, setQty, toggleWishlist]);
 
-  return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
+  return <ShopContext.Provider value={value}>{catalogReady ? children : <div className="grid min-h-screen place-items-center bg-[#f7f4ef] text-sm text-stone-500">Loading store...</div>}</ShopContext.Provider>;
+}
+
+function parseRemoteList(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  if (typeof value !== "string" || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+  } catch {
+    return value.split("\n").map((item) => item.trim()).filter(Boolean);
+  }
+}
+
+function parseRemoteJson(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  try { return JSON.parse(value); } catch { return value; }
 }
 
 export function useShop() {

@@ -36,6 +36,7 @@ import {
   type Product,
 } from "@/data/catalog";
 import { ShopProvider, useShop } from "@/lib/shop-store";
+import { ADMIN_API_BASE, resolveImageUrl } from "@/lib/admin-api";
 import heroGlow from "@/assets/hero-glow.jpg";
 import heroLgs from "@/assets/carousel-3.png";
 import heroSalon from "@/assets/hero-salon.jpg";
@@ -46,6 +47,10 @@ import lgsLogo from "@/assets/lgs_logo.png";
 import storeFront from "@/assets/store-front.jpg";
 import storeInterior from "@/assets/store-interior.jpg";
 import storeShelf from "@/assets/store-shelf.jpg";
+import cancellationPolicy from "@/content/policies/cancellation-and-return.txt?raw";
+import privacyPolicy from "@/content/policies/privacy.txt?raw";
+import shippingPolicy from "@/content/policies/shipping.txt?raw";
+import termsPolicy from "@/content/policies/terms-and-conditions.txt?raw";
 
 const nav = [
   ["Home", "/"],
@@ -91,13 +96,15 @@ function SocialFloatingButtons() {
           >
             <Instagram size={15} strokeWidth={2.4} />
           </a>
-          <button
-            type="button"
-            aria-label="Facebook link coming soon"
+          <a
+            aria-label="Open Facebook"
+            href={site.facebook}
+            target="_blank"
+            rel="noreferrer"
             className="grid size-10 place-items-center rounded-full bg-[#4c6faf] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
           >
             <Facebook size={15} strokeWidth={2.4} />
-          </button>
+          </a>
           <button
             type="button"
             aria-label="YouTube link coming soon"
@@ -105,13 +112,15 @@ function SocialFloatingButtons() {
           >
             <Youtube size={15} strokeWidth={2.4} />
           </button>
-          <button
-            type="button"
-            aria-label="WhatsApp link coming soon"
+          <a
+            aria-label="Open WhatsApp"
+            href={whatsappUrl}
+            target="_blank"
+            rel="noreferrer"
             className="grid size-10 place-items-center rounded-full bg-[#25d366] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
           >
             <WhatsAppGlyph />
-          </button>
+          </a>
         </div>
       )}
       <button
@@ -279,27 +288,34 @@ export function ProductCard({ p }: { p: Product }) {
   const { addToCart, toggleWishlist, isWishlisted } = useShop();
   const catName = categoryBySlug(p.category)?.name ?? p.type;
   const hasVariants = Boolean(p.variants?.length);
+  const stock = p.stock ?? (p.inStock ? 24 : 0);
+  const outOfStock = stock <= 0;
   const startingPrice = hasVariants ? Math.min(...(p.variants ?? []).map((v) => v.price)) : p.price;
   return (
-    <article className="group min-w-0 bg-white">
-      <div className="relative aspect-[4/5] overflow-hidden bg-secondary">
+    <article className="group flex h-full min-w-0 flex-col bg-white">
+      <div className="relative aspect-[5/6] overflow-hidden bg-secondary">
         <a href={`/product/${p.slug}`}>
           <img
             src={p.image}
             alt={p.name}
             loading="lazy"
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-105 group-hover:opacity-0"
+            className="h-full w-full object-contain p-2 transition duration-700 group-hover:scale-105 group-hover:opacity-0"
           />
           <img
-            src={p.hoverImage}
+            src={p.image}
             alt=""
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-500 group-hover:opacity-100"
+            className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition duration-500 group-hover:opacity-100"
           />
         </a>
         <span className="absolute left-2 top-2 bg-wine px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-white">
           {p.tags[0]}
         </span>
+        {outOfStock ? (
+          <span className="absolute bottom-2 left-2 bg-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white">Out of stock</span>
+        ) : stock <= 3 ? (
+          <span className="absolute bottom-2 left-2 bg-[#db0107] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white">Only {stock} left</span>
+        ) : null}
         <button
           onClick={() => toggleWishlist(p)}
           className="absolute right-2 top-2 grid size-9 place-items-center rounded-full bg-white/90"
@@ -308,13 +324,13 @@ export function ProductCard({ p }: { p: Product }) {
           <Heart size={17} className={isWishlisted(p.id) ? "fill-wine text-wine" : ""} />
         </button>
       </div>
-      <div className="p-3 sm:p-4">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
         <p className="text-[9px] font-bold uppercase tracking-[.16em] text-muted-foreground">
           {p.brand} · {catName}
         </p>
         <a
           href={`/product/${p.slug}`}
-          className="mt-1 line-clamp-1 block font-display text-base font-semibold sm:text-lg"
+          className="mt-1 line-clamp-2 min-h-[3rem] block font-display text-base font-semibold leading-6 sm:text-lg"
         >
           {p.name}
         </a>
@@ -335,10 +351,11 @@ export function ProductCard({ p }: { p: Product }) {
           )}
         </div>
         <button
-          onClick={() => addToCart(p)}
-          className="mt-3 h-10 w-full border border-wine text-[10px] font-bold tracking-[.14em] text-wine transition hover:bg-wine hover:text-white"
+          onClick={() => !outOfStock && addToCart(p)}
+          disabled={outOfStock}
+          className="mt-auto h-10 w-full border border-wine text-[10px] font-bold tracking-[.14em] text-wine transition hover:bg-wine hover:text-white disabled:cursor-not-allowed disabled:border-stone-300 disabled:text-stone-400 disabled:hover:bg-transparent"
         >
-          ADD TO BAG
+          {outOfStock ? "OUT OF STOCK" : "ADD TO BAG"}
         </button>
       </div>
     </article>
@@ -380,13 +397,18 @@ const heroes = [
   },
 ];
 export function HomePage() {
+  type TrendKey = "skin" | "hair" | "lgs";
   const [slide, setSlide] = useState(0),
-    [trend, setTrend] = useState("makeup");
+    [trend, setTrend] = useState<TrendKey>("skin");
   useEffect(() => {
     const id = setInterval(() => setSlide((x) => (x + 1) % heroes.length), 6000);
     return () => clearInterval(id);
   }, []);
-  const trending = products.filter((p) => p.category === trend).slice(0, 4);
+  const trending = products.filter((p) => {
+    if (trend === "skin") return p.category === "skincare";
+    if (trend === "hair") return p.category === "hair-care" || p.category === "hair-accessories";
+    return p.category === "lgs-products" || p.brand.toLowerCase() === "lgs";
+  }).slice(0, 4);
   return (
     <>
       <section className="relative min-h-[540px] overflow-hidden bg-wine-deep min-[375px]:min-h-[570px] sm:min-h-[680px] lg:min-h-[calc(100vh-163px)]">
@@ -501,36 +523,6 @@ export function HomePage() {
           </div>
         </div>
       </section>
-      <Section
-        eyebrow="THE HOUSE BRAND"
-        title="Discover LGS"
-        sub="Our own beauty & skincare collection."
-      >
-        <div className="grid overflow-hidden bg-wine-deep lg:grid-cols-2">
-          <img
-            src={lgsCampaign}
-            alt="LGS beauty collection"
-            loading="lazy"
-            className="h-full min-h-[420px] w-full object-cover"
-          />
-          <div className="p-5 sm:p-10">
-            <div className="grid grid-cols-2 gap-3">
-              {products
-                .filter((p) => p.brand === "LGS")
-                .slice(0, 4)
-                .map((p) => (
-                  <ProductCard p={p} key={p.id} />
-                ))}
-            </div>
-            <a
-              href="/lgs-products"
-              className="mt-8 inline-flex items-center gap-3 text-xs font-bold tracking-widest text-gold-soft"
-            >
-              SHOP ALL LGS PRODUCTS <ArrowRight size={15} />
-            </a>
-          </div>
-        </div>
-      </Section>
       <ProductSection
         title="Just In"
         sub="Fresh beauty picks you'll love."
@@ -635,11 +627,9 @@ export function HomePage() {
         <div className="mb-8 flex gap-5 overflow-x-auto border-b">
           {(
             [
-              ["Makeup", "makeup"],
-              ["Skincare", "skincare"],
-              ["Nails", "nail-care"],
-              ["LGS", "lgs-products"],
-              ["Accessories", "hair-accessories"],
+              ["Skin", "skin"],
+              ["Hair", "hair"],
+              ["LGS", "lgs"],
             ] as const
           ).map(([n, k]) => (
             <button
@@ -877,20 +867,40 @@ function VideoExperience() {
   );
 }
 function InstagramBlock() {
+  const fallbackImages = [storeShelf, heroFestive, cat(0), storeInterior, lgsCampaign, cat(2)];
+  const [posts, setPosts] = useState<{ id: number; image: string; caption?: string | null; link?: string | null }[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`${ADMIN_API_BASE}/api/instagram-posts`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (active && Array.isArray(payload?.data)) setPosts(payload.data.slice(0, 6));
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const items = posts.length > 0
+    ? posts
+    : fallbackImages.map((image, index) => ({ id: index, image, caption: null, link: site.instagram }));
+
   return (
     <Section title="Follow Our Beauty World" sub={site.instagramHandle}>
       <div className="grid grid-cols-3 gap-1 sm:grid-cols-6">
-        {[storeShelf, heroFestive, cat(0), storeInterior, lgsCampaign, cat(2)].map((im, i) => (
+        {items.map((post) => (
           <a
-            href={site.instagram}
+            href={post.link || site.instagram}
             target="_blank"
             rel="noreferrer"
             className="group relative aspect-square overflow-hidden"
-            key={i}
+            key={post.id}
           >
             <img
-              src={im}
-              alt="Lucky Varieties beauty inspiration"
+              src={resolveImageUrl(post.image)}
+              alt={post.caption || "Lucky Varieties beauty inspiration"}
               loading="lazy"
               className="h-full w-full object-cover transition group-hover:scale-105"
             />
@@ -1028,7 +1038,7 @@ function Footer() {
         ["For Salons", "/for-salons"],
         ["FAQs", "/faqs"],
         ["Shipping Information", "/shipping-information"],
-        ["Return Policy", "/return-policy"],
+        ["Cancellation & Return Policy", "/return-policy"],
         ["Privacy Policy", "/privacy-policy"],
         ["Terms & Conditions", "/terms-and-conditions"],
       ],
@@ -1042,8 +1052,7 @@ function Footer() {
             <img src={lgsLogo} alt="Lucky Varieties Beauty Mall" className="h-14 w-auto" />
           </a>
           <p className="mt-3 max-w-[330px] text-sm leading-6 text-white/60 sm:max-w-sm">
-            Premium beauty products for everyday glow. Beauty, personal care, jewellery and
-            professional salon solutions in Koregaon.
+            {site.tagline}. Beauty, personal care and professional salon solutions in Koregaon.
           </p>
           <a
             href={site.instagram}
@@ -1052,6 +1061,21 @@ function Footer() {
             <Instagram size={17} />
             {site.instagramHandle}
           </a>
+          <a
+            href={site.facebook}
+            target="_blank"
+            rel="noreferrer"
+            className="ml-4 inline-flex items-center gap-2 text-xs text-gold"
+          >
+            <Facebook size={17} />
+            Facebook
+          </a>
+          <div className="mt-4 space-y-1 text-xs leading-5 text-white/60">
+            <a href={`tel:${site.phones[0]}`} className="block hover:text-white">
+              {site.phonesDisplay[0]}
+            </a>
+            <p>{site.address.line1}, {site.address.line2}</p>
+          </div>
         </div>
         {columns.map((column) => (
           <div key={column.title}>
@@ -1304,7 +1328,115 @@ const infoPages: Record<
   },
 };
 
+const policyDocuments: Partial<Record<InfoPageKey, string>> = {
+  "shipping-information": shippingPolicy,
+  "return-policy": cancellationPolicy,
+  "privacy-policy": privacyPolicy,
+  "terms-and-conditions": termsPolicy,
+};
+
+const policyTitles: Partial<Record<InfoPageKey, string>> = {
+  "shipping-information": "Shipping Policy",
+  "return-policy": "Cancellation & Return Policy",
+  "privacy-policy": "Privacy Policy",
+  "terms-and-conditions": "Terms & Conditions",
+};
+
+type ParsedPolicySection = {
+  heading: string;
+  paragraphs: string[];
+  bullets: string[];
+};
+
+type ParsedPolicy = {
+  lastUpdated: string;
+  sections: ParsedPolicySection[];
+};
+
+function parsePolicyDocument(raw: string): ParsedPolicy {
+  const lines = raw.replace(/\r/g, "").split("\n").map((line) => line.trim());
+  const firstContentIndex = lines.findIndex(Boolean);
+  const lastUpdated = lines.find((line) => /^Last Updated:/i.test(line))?.replace(/^Last Updated:\s*/i, "") ?? "";
+  const sections: ParsedPolicySection[] = [];
+  let current: ParsedPolicySection = { heading: "Overview", paragraphs: [], bullets: [] };
+  let paragraphLines: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraphLines.length > 0) {
+      current.paragraphs.push(paragraphLines.join(" "));
+      paragraphLines = [];
+    }
+  };
+
+  const flushSection = () => {
+    flushParagraph();
+    if (current.paragraphs.length > 0 || current.bullets.length > 0) sections.push(current);
+  };
+
+  for (const line of lines.slice(firstContentIndex + 1)) {
+    if (!line) {
+      flushParagraph();
+      continue;
+    }
+    const heading = line.match(/^(\d+)\.\s+(.+)$/);
+    if (heading) {
+      flushSection();
+      current = { heading: `${heading[1]}. ${heading[2]}`, paragraphs: [], bullets: [] };
+      continue;
+    }
+    if (line.startsWith("* ")) {
+      flushParagraph();
+      current.bullets.push(line.slice(2));
+      continue;
+    }
+    if (/^Last Updated:/i.test(line) || /^©|^Â©/.test(line)) continue;
+    paragraphLines.push(line);
+  }
+  flushSection();
+
+  return { lastUpdated, sections };
+}
+
+function PolicyPage({ page }: { page: InfoPageKey }) {
+  const raw = policyDocuments[page];
+  const title = policyTitles[page];
+  if (!raw || !title) return null;
+  const policy = parsePolicyDocument(raw);
+
+  return (
+    <>
+      <PageHero
+        title={title}
+        copy={policy.lastUpdated ? `Last updated: ${policy.lastUpdated}` : "Please review this policy before placing an order."}
+      />
+      <section className="container-lv py-12 sm:py-16">
+        <div className="mx-auto max-w-4xl space-y-8">
+          {policy.sections.map((section) => (
+            <article className="border-b border-wine/10 pb-8 last:border-0" key={section.heading}>
+              <h2 className="text-2xl text-wine sm:text-3xl">{section.heading}</h2>
+              <div className="mt-4 space-y-4 text-sm leading-7 text-muted-foreground">
+                {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                {section.bullets.length > 0 && (
+                  <ul className="list-disc space-y-2 pl-5 marker:text-wine">
+                    {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                )}
+              </div>
+            </article>
+          ))}
+          <div className="bg-secondary p-6 text-sm leading-7">
+            <b>Need more help?</b>
+            <br />
+            Call {site.phonesDisplay[0]} or visit our store at {site.address.line1}, {site.address.line2}.
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
 export function InfoPage({ page }: { page: InfoPageKey }) {
+  if (policyDocuments[page]) return <PolicyPage page={page} />;
   const content = infoPages[page];
   if (page === "gallery")
     return (
@@ -1496,17 +1628,34 @@ export function CatalogPage({
   title?: string;
   filter?: (p: Product) => boolean;
 }) {
-  const list = filter ? products.filter(filter) : products;
+  const [sort, setSort] = useState<"featured" | "price" | "price-desc" | "newest">("featured");
+  const filteredProducts = filter ? products.filter(filter) : products;
+  const list = [...filteredProducts].sort((a, b) => {
+    if (sort === "price") return a.price - b.price;
+    if (sort === "price-desc") return b.price - a.price;
+    if (sort === "newest") {
+      const aIsNew = a.tags.includes("new") ? 1 : 0;
+      const bIsNew = b.tags.includes("new") ? 1 : 0;
+      return bIsNew - aIsNew;
+    }
+    return 0;
+  });
   return (
     <>
       <PageHero title={title} copy={`${list.length} carefully selected beauty essentials`} />
       <div className="container-lv py-10">
         <div className="mb-6 flex items-center justify-between border-b pb-4">
           <span className="text-xs text-muted-foreground">{list.length} PRODUCTS</span>
-          <select className="border bg-white px-3 py-2 text-xs">
-            <option>Featured</option>
-            <option>Price: Low to High</option>
-            <option>Newest</option>
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as typeof sort)}
+            className="border bg-white px-3 py-2 text-xs"
+            aria-label="Sort products"
+          >
+            <option value="featured">Featured</option>
+            <option value="price">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="newest">Newest</option>
           </select>
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
@@ -1539,7 +1688,8 @@ export function ProductPage({ product }: { product: Product }) {
     [shade, setShade] = useState(product.shades?.[0]?.name),
     [variant, setVariant] = useState(product.variants?.[0]?.label),
     [selectedImage, setSelectedImage] = useState(product.image);
-  const galleryImages = Array.from(new Set([product.image, product.hoverImage]));
+  const galleryImages = Array.from(new Set([product.image, product.hoverImage, ...(product.galleryImages ?? [])]));
+  useEffect(() => setSelectedImage(product.image), [product.image]);
   const selectedVariant = product.variants?.find((v) => v.label === variant) ?? product.variants?.[0];
   const activePrice = selectedVariant?.price ?? product.price;
   const activeMrp = selectedVariant?.mrp ?? product.mrp;
@@ -1565,17 +1715,17 @@ export function ProductPage({ product }: { product: Product }) {
               >
                 <img
                   src={image}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                   alt={`${product.name} view ${index + 1}`}
                 />
               </button>
             ))}
           </div>
-          <div className="aspect-[4/5] overflow-hidden bg-secondary">
+          <div className="aspect-[5/6] overflow-hidden bg-secondary">
             <img
               src={selectedImage}
               alt={product.name}
-              className="h-full w-full object-cover transition-opacity duration-300"
+              className="h-full w-full object-contain p-2 transition-opacity duration-300"
             />
           </div>
         </div>
@@ -1741,8 +1891,25 @@ export function ProductPage({ product }: { product: Product }) {
 export function CheckoutPage() {
   const { lines, subtotal, setQty, removeFromCart } = useShop();
   const delivery = subtotal >= 999 || subtotal === 0 ? 0 : 79;
-  const total = subtotal + delivery;
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const discount = coupon?.discount ?? 0;
+  const total = Math.max(subtotal + delivery - discount, 0);
   const [payment, setPayment] = useState("cod");
+
+  async function applyCoupon() {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true); setCouponMessage("");
+    try {
+      const response = await fetch(`${ADMIN_API_BASE}/api/coupons/validate/${encodeURIComponent(couponCode.trim())}?subtotal=${subtotal}`);
+      const data = await response.json();
+      if (!response.ok) { setCoupon(null); setCouponMessage(data?.message || "Invalid coupon code."); }
+      else { setCoupon(data.data); setCouponMessage("Coupon applied successfully."); }
+    } catch { setCouponMessage("Unable to validate coupon right now."); }
+    finally { setCouponLoading(false); }
+  }
 
   if (lines.length === 0) {
     return (
@@ -1916,6 +2083,14 @@ export function CheckoutPage() {
               </div>
             ))}
           </div>
+          <div className="mt-5 border-t pt-5">
+            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Coupon code</label>
+            <div className="mt-2 flex gap-2">
+              <input value={couponCode} onChange={(event) => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon code" className="h-11 min-w-0 flex-1 border px-3 text-sm outline-none focus:border-wine" />
+              <button type="button" onClick={applyCoupon} disabled={couponLoading} className="h-11 bg-wine px-4 text-xs font-bold text-white disabled:opacity-60">{couponLoading ? "..." : "APPLY"}</button>
+            </div>
+            {couponMessage && <p className={`mt-2 text-xs ${coupon ? "text-emerald-700" : "text-red-600"}`}>{couponMessage}</p>}
+          </div>
           <div className="mt-5 space-y-3 border-t pt-5 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
@@ -1925,6 +2100,7 @@ export function CheckoutPage() {
               <span className="text-muted-foreground">Delivery</span>
               <span>{delivery ? formatINR(delivery) : "FREE"}</span>
             </div>
+            {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Coupon discount</span><span>-{formatINR(discount)}</span></div>}
             <div className="flex justify-between border-t pt-4 text-lg">
               <b>Total</b>
               <b>{formatINR(total)}</b>

@@ -1,0 +1,35 @@
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
+
+export const Product = sequelize.define(
+  "Product",
+  {
+    name: { type: DataTypes.STRING(180), allowNull: false },
+    slug: { type: DataTypes.STRING(220), allowNull: false, unique: true },
+    brand: { type: DataTypes.STRING(120), allowNull: true },
+    type: { type: DataTypes.STRING(120), allowNull: true },
+    subtitle: { type: DataTypes.STRING(220), allowNull: true },
+    description: { type: DataTypes.TEXT, allowNull: true },
+    shortDescription: { type: DataTypes.TEXT, allowNull: true, field: "short_description" },
+    price: { type: DataTypes.DECIMAL(10, 2), allowNull: false, defaultValue: 0 },
+    salePrice: { type: DataTypes.DECIMAL(10, 2), allowNull: true, field: "sale_price" },
+    sku: { type: DataTypes.STRING(100), allowNull: true },
+    stock: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    mainImage: { type: DataTypes.STRING(255), allowNull: true, field: "main_image" },
+    additionalImages: { type: DataTypes.JSON, allowNull: true, field: "additional_images" },
+    status: { type: DataTypes.STRING(20), allowNull: false, defaultValue: "Active" },
+    featured: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    ingredients: { type: DataTypes.TEXT, allowNull: true },
+    benefits: { type: DataTypes.TEXT, allowNull: true },
+    usage: { type: DataTypes.TEXT, allowNull: true },
+    size: { type: DataTypes.STRING(120), allowNull: true },
+    variants: { type: DataTypes.JSON, allowNull: true },
+    tags: { type: DataTypes.JSON, allowNull: true },
+    rating: { type: DataTypes.DECIMAL(3, 1), allowNull: true },
+    reviews: { type: DataTypes.INTEGER, allowNull: true },
+    metaTitle: { type: DataTypes.STRING(180), allowNull: true, field: "meta_title" },
+    metaDescription: { type: DataTypes.TEXT, allowNull: true, field: "meta_description" },
+    categoryId: { type: DataTypes.INTEGER, allowNull: false, field: "category_id" },
+  },
+  { tableName: "products" },
+);

@@ -3,11 +3,19 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "workspaces": [
+    "backend"
+  ],
   "scripts": {
-    "dev": "vite dev",
+    "dev": "node scripts/dev.mjs",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "dev:frontend": "vite dev",
+    "dev:backend": "node backend/server.js",
+    "db:create": "npm run db:create --workspace backend",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:seed": "npm run db:seed --workspace backend",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

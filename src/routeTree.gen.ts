@@ -20,9 +20,18 @@ import { Route as LgsProductsRouteImport } from './routes/lgs-products'
 import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminLayoutRouteImport } from './routes/admin/_layout'
+import { Route as AdminCouponsRouteImport } from './routes/admin/coupons'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as AdminInstagramPostsRouteImport } from './routes/admin/instagram-posts'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminProductsRouteImport } from './routes/admin/products'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
+import { Route as AdminProductsIndexRouteImport } from './routes/admin/products.index'
+import { Route as AdminProductsAddRouteImport } from './routes/admin/products.add'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -79,6 +88,41 @@ const WishlistRoute = WishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLayoutRoute = AdminLayoutRouteImport.update({
+  id: '/admin/_layout',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminCouponsRoute = AdminCouponsRouteImport.update({
+  id: '/admin/coupons',
+  path: '/admin/coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInstagramPostsRoute = AdminInstagramPostsRouteImport.update({
+  id: '/admin/instagram-posts',
+  path: '/admin/instagram-posts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/admin/products',
+  path: '/admin/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
@@ -94,6 +138,16 @@ const ShopCategoryRoute = ShopCategoryRouteImport.update({
   path: '/shop/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminProductsRoute,
+} as any)
+const AdminProductsAddRoute = AdminProductsAddRouteImport.update({
+  id: '/add',
+  path: '/add',
+  getParentRoute: () => AdminProductsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,9 +161,18 @@ export interface FileRoutesByFullPath {
   '/new-arrivals': typeof NewArrivalsRoute
   '/offers': typeof OffersRoute
   '/wishlist': typeof WishlistRoute
+  '/admin': typeof AdminLayoutRoute
+  '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/instagram-posts': typeof AdminInstagramPostsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRouteWithChildren
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/admin/': typeof AdminIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/admin/products/add': typeof AdminProductsAddRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -123,9 +186,16 @@ export interface FileRoutesByTo {
   '/new-arrivals': typeof NewArrivalsRoute
   '/offers': typeof OffersRoute
   '/wishlist': typeof WishlistRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/instagram-posts': typeof AdminInstagramPostsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop': typeof ShopIndexRoute
+  '/admin/products/add': typeof AdminProductsAddRoute
+  '/admin/products': typeof AdminProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -140,9 +210,18 @@ export interface FileRoutesById {
   '/new-arrivals': typeof NewArrivalsRoute
   '/offers': typeof OffersRoute
   '/wishlist': typeof WishlistRoute
+  '/admin/_layout': typeof AdminLayoutRoute
+  '/admin/coupons': typeof AdminCouponsRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/instagram-posts': typeof AdminInstagramPostsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/products': typeof AdminProductsRouteWithChildren
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/admin/': typeof AdminIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/admin/products/add': typeof AdminProductsAddRoute
+  '/admin/products/': typeof AdminProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,9 +237,18 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/offers'
     | '/wishlist'
+    | '/admin'
+    | '/admin/coupons'
+    | '/admin/dashboard'
+    | '/admin/instagram-posts'
+    | '/admin/login'
+    | '/admin/products'
     | '/product/$slug'
     | '/shop/$category'
+    | '/admin/'
     | '/shop/'
+    | '/admin/products/add'
+    | '/admin/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -174,9 +262,16 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/offers'
     | '/wishlist'
+    | '/admin'
+    | '/admin/coupons'
+    | '/admin/dashboard'
+    | '/admin/instagram-posts'
+    | '/admin/login'
     | '/product/$slug'
     | '/shop/$category'
     | '/shop'
+    | '/admin/products/add'
+    | '/admin/products'
   id:
     | '__root__'
     | '/'
@@ -190,9 +285,18 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/offers'
     | '/wishlist'
+    | '/admin/_layout'
+    | '/admin/coupons'
+    | '/admin/dashboard'
+    | '/admin/instagram-posts'
+    | '/admin/login'
+    | '/admin/products'
     | '/product/$slug'
     | '/shop/$category'
+    | '/admin/'
     | '/shop/'
+    | '/admin/products/add'
+    | '/admin/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,8 +311,15 @@ export interface RootRouteChildren {
   NewArrivalsRoute: typeof NewArrivalsRoute
   OffersRoute: typeof OffersRoute
   WishlistRoute: typeof WishlistRoute
+  AdminLayoutRoute: typeof AdminLayoutRoute
+  AdminCouponsRoute: typeof AdminCouponsRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminInstagramPostsRoute: typeof AdminInstagramPostsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminProductsRoute: typeof AdminProductsRouteWithChildren
   ProductSlugRoute: typeof ProductSlugRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
+  AdminIndexRoute: typeof AdminIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
 }
 
@@ -291,6 +402,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/_layout': {
+      id: '/admin/_layout'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/coupons': {
+      id: '/admin/coupons'
+      path: '/admin/coupons'
+      fullPath: '/admin/coupons'
+      preLoaderRoute: typeof AdminCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/instagram-posts': {
+      id: '/admin/instagram-posts'
+      path: '/admin/instagram-posts'
+      fullPath: '/admin/instagram-posts'
+      preLoaderRoute: typeof AdminInstagramPostsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/admin/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
@@ -312,8 +472,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/products/': {
+      id: '/admin/products/'
+      path: '/'
+      fullPath: '/admin/products/'
+      preLoaderRoute: typeof AdminProductsIndexRouteImport
+      parentRoute: typeof AdminProductsRoute
+    }
+    '/admin/products/add': {
+      id: '/admin/products/add'
+      path: '/add'
+      fullPath: '/admin/products/add'
+      preLoaderRoute: typeof AdminProductsAddRouteImport
+      parentRoute: typeof AdminProductsRoute
+    }
   }
 }
+
+interface AdminProductsRouteChildren {
+  AdminProductsAddRoute: typeof AdminProductsAddRoute
+  AdminProductsIndexRoute: typeof AdminProductsIndexRoute
+}
+
+const AdminProductsRouteChildren: AdminProductsRouteChildren = {
+  AdminProductsAddRoute: AdminProductsAddRoute,
+  AdminProductsIndexRoute: AdminProductsIndexRoute,
+}
+
+const AdminProductsRouteWithChildren = AdminProductsRoute._addFileChildren(
+  AdminProductsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -327,8 +515,15 @@ const rootRouteChildren: RootRouteChildren = {
   NewArrivalsRoute: NewArrivalsRoute,
   OffersRoute: OffersRoute,
   WishlistRoute: WishlistRoute,
+  AdminLayoutRoute: AdminLayoutRoute,
+  AdminCouponsRoute: AdminCouponsRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminInstagramPostsRoute: AdminInstagramPostsRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminProductsRoute: AdminProductsRouteWithChildren,
   ProductSlugRoute: ProductSlugRoute,
   ShopCategoryRoute: ShopCategoryRoute,
+  AdminIndexRoute: AdminIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
 }
 export const routeTree = rootRouteImport

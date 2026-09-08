@@ -9,6 +9,9 @@ import catSalon from "@/assets/cat-salon.jpg";
 import storeShelf from "@/assets/store-shelf.jpg";
 import lgsCampaign from "@/assets/lgs-campaign.jpg";
 import heroFestive from "@/assets/hero_festive.png";
+import lgsSkincareCatalog from "@/assets/products/lgs-brochure/lgs-skincare-facial-catalog.jpeg";
+import lgsTreatmentCatalog from "@/assets/products/lgs-brochure/lgs-skincare-treatment-catalog.jpeg";
+import lgsHairCatalog from "@/assets/products/lgs-brochure/lgs-hair-care-catalog.jpeg";
 
 export type Category = {
   slug: string;
@@ -142,9 +145,11 @@ export type Product = {
   reviews: number;
   image: string;
   hoverImage: string;
+  galleryImages?: string[];
   shades?: { name: string; hex: string }[];
   variants?: { label: string; size?: string; price: number; mrp?: number }[];
   size?: string;
+  stock?: number;
   keyIngredients?: string[];
   tags: ("bestseller" | "new" | "trending" | "offer")[];
   inStock: boolean;
@@ -579,6 +584,21 @@ const seeds: Seed[] = [
   },
 ];
 
+const brochureSeeds: Seed[] = [
+  { name: "LGS Moisturizer", brand: "LGS", category: "lgs-products", type: "Moisturizers", subtitle: "Daily Moisturizer", price: 299, mrp: 299, image: lgsSkincareCatalog, hoverImage: lgsSkincareCatalog, size: "100 gm", variants: [{ label: "100 gm", size: "100 gm", price: 299 }, { label: "200 gm", size: "200 gm", price: 499 }], tags: ["new"], description: "LGS daily moisturizer for soft, hydrated-looking skin.", howToUse: "Apply gently to clean skin.", benefits: ["Helps moisturize skin."], inStock: true },
+  { name: "LGS Anti Blemishing Face Bar", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Anti blemishing face bar", price: 59, mrp: 59, image: lgsSkincareCatalog, hoverImage: lgsSkincareCatalog, size: "25 gm", tags: ["new"], description: "LGS anti blemishing cleansing bar.", howToUse: "Lather with water and rinse.", benefits: ["Gentle daily cleansing."], inStock: true },
+  { name: "LGS D-TAN Face Pack", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "D-TAN face pack", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "100 gm", variants: [{ label: "100 gm", size: "100 gm", price: 369 }, { label: "250 gm", size: "250 gm", price: 699 }], tags: ["new"], description: "LGS D-TAN face pack for salon care.", howToUse: "Apply as directed and rinse.", benefits: ["Helps refresh the look of skin."], inStock: true },
+  { name: "LGS Anti Blemish Cream", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Treatment care cream", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "50 gm", tags: ["new"], description: "LGS anti blemish cream with neem and aloe vera.", howToUse: "Apply gently to clean skin.", benefits: ["Helps support clear-looking skin."], inStock: true },
+  { name: "LGS Under Eye Gel", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Reduces dark circles", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "50 gm", tags: ["new"], description: "LGS under eye gel with carrot oil and aloe vera.", howToUse: "Apply carefully around the eye area.", benefits: ["Hydrates the under-eye area."], inStock: true },
+  { name: "LGS Acne Pimple Oil Control Cream", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Treatment care cream", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "50 gm", tags: ["new"], description: "LGS acne pimple oil control cream with tea tree oil and aloe vera.", howToUse: "Apply gently to clean skin.", benefits: ["Helps control excess oil appearance."], inStock: true },
+  { name: "LGS SPF 50 Sunscreen", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Daily sun protection", price: 299, mrp: 299, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "100 gm", tags: ["new"], description: "LGS sunscreen for everyday UVA and UVB protection.", howToUse: "Apply before sun exposure and reapply as needed.", benefits: ["Helps protect skin from sun exposure."], inStock: true },
+  { name: "LGS Hair Tonic", brand: "LGS", category: "hair-care", type: "Hair Care", subtitle: "Hair tonic", price: 599, mrp: 599, image: lgsHairCatalog, hoverImage: lgsHairCatalog, size: "175 ml", tags: ["new"], description: "LGS hair tonic for regular hair care.", howToUse: "Apply to scalp as directed.", benefits: ["Supports a healthy-looking scalp."], inStock: true },
+  { name: "LGS Jasmine Hair Oil", brand: "LGS", category: "hair-care", type: "Hair Care", subtitle: "Jasmine hair oil", price: 299, mrp: 299, image: lgsHairCatalog, hoverImage: lgsHairCatalog, size: "100 ml", tags: ["new"], description: "LGS jasmine hair oil.", howToUse: "Massage into scalp and hair.", benefits: ["Supports regular hair-oiling routines."], inStock: true },
+  { name: "LGS Hair Serum", brand: "LGS", category: "hair-care", type: "Hair Care", subtitle: "Vitamin E hair serum", price: 199, mrp: 199, image: lgsHairCatalog, hoverImage: lgsHairCatalog, size: "50 ml", variants: [{ label: "50 ml", size: "50 ml", price: 199 }, { label: "100 ml", size: "100 ml", price: 369 }], tags: ["new"], description: "LGS hair serum with vitamin E.", howToUse: "Apply a small amount to hair lengths.", benefits: ["Helps smooth the look of hair."], inStock: true },
+  { name: "LGS Hair Growth Active Serum", brand: "LGS", category: "hair-care", type: "Hair Care", subtitle: "Hair growth active serum", price: 1599, mrp: 1599, image: lgsHairCatalog, hoverImage: lgsHairCatalog, size: "30 ml", tags: ["new"], description: "LGS hair growth active serum.", howToUse: "Apply to scalp as directed.", benefits: ["Supports a healthy-looking hair routine."], inStock: true },
+  { name: "LGS Fairness Cream", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Instant skin glow cream", price: 249, mrp: 249, image: lgsHairCatalog, hoverImage: lgsHairCatalog, size: "50 gm", variants: [{ label: "50 gm", size: "50 gm", price: 249 }, { label: "100 gm", size: "100 gm", price: 499 }], tags: ["new"], description: "LGS fairness cream for an even, glowing-looking appearance.", howToUse: "Apply gently to clean skin.", benefits: ["Helps moisturize and brighten the look of skin."], inStock: true },
+];
+
 const lgsSeeds: Seed[] = [
   {
     name: "LGS Aloe Vera Shampoo",
@@ -972,11 +992,14 @@ const lgsSeeds: Seed[] = [
 
 const normalizeProduct = (s: Seed, i: number): Product => {
   const cat = categoryBySlug(s.category);
+  const displayName = s.name.replace(/^LGS\s+/i, "").trim();
   return {
     ...s,
+    name: displayName,
     id: `lv-${String(i + 1).padStart(3, "0")}`,
-    slug: slugify(s.name),
+    slug: slugify(displayName),
     inStock: s.inStock ?? true,
+    stock: s.stock ?? (s.inStock === false ? 0 : 24),
     description:
       s.description ??
       `${s.name} from ${s.brand}, available at Lucky Varieties Beauty Mall, Koregaon. Part of our ${cat?.name ?? "beauty"} range, selected for everyday use and dependable quality.`,
@@ -997,7 +1020,8 @@ const normalizeProduct = (s: Seed, i: number): Product => {
   };
 };
 
-export const products: Product[] = [...seeds, ...lgsSeeds].map(normalizeProduct);
+// The client brochure contains 23 LGS products. Keep only this production catalog on the storefront.
+export const products: Product[] = [...brochureSeeds, ...lgsSeeds.slice(0, 2)].map(normalizeProduct);
 
 export const productBySlug = (slug: string) => products.find((p) => p.slug === slug);
 export const byTag = (tag: Product["tags"][number]) => products.filter((p) => p.tags.includes(tag));
