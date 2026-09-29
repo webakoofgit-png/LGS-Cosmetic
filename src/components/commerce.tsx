@@ -27,12 +27,9 @@ import { Toaster, toast } from "sonner";
 import { announcements, formatINR, mapsEmbedUrl, mapsUrl, site, whatsappUrl } from "@/data/site";
 import {
   beautyNeeds,
-  byTag,
   categoryBySlug,
   categories,
   discountOf,
-  products,
-  searchProducts,
   type Product,
 } from "@/data/catalog";
 import { ShopProvider, useShop } from "@/lib/shop-store";
@@ -507,7 +504,7 @@ export function HomePage() {
       <ProductSection
         title="Our Best Sellers"
         sub="The beauty favourites customers return for."
-        list={byTag("bestseller").slice(0, 6)}
+        list={adminProducts.filter((p) => p.tags.includes("bestseller")).slice(0, 6)}
       />
       <section className="w-full py-8">
         <div className="relative min-h-[440px] overflow-hidden">
@@ -536,7 +533,7 @@ export function HomePage() {
       <ProductSection
         title="Just In"
         sub="Fresh beauty picks you'll love."
-        list={byTag("new").slice(0, 6)}
+        list={adminProducts.filter((p) => p.tags.includes("new")).slice(0, 6)}
       />
       <Section title="Shop by Beauty Need">
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
@@ -1562,9 +1559,11 @@ function CartDrawer() {
   );
 }
 function SearchOverlay() {
-  const { searchOpen, setSearchOpen } = useShop();
+  const { searchOpen, setSearchOpen, catalogProducts } = useShop();
   const [q, setQ] = useState("");
-  const results = useMemo(() => searchProducts(q).slice(0, 6), [q]);
+  const results = useMemo(() => catalogProducts.filter((p) =>
+    `${p.name} ${p.brand} ${p.category} ${p.type}`.toLowerCase().includes(q.trim().toLowerCase()),
+  ).slice(0, 6), [q, catalogProducts]);
   if (!searchOpen) return null;
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-ivory pb-8">
@@ -1604,15 +1603,13 @@ function SearchOverlay() {
 export function CatalogPage({
   title = "Shop All Beauty",
   filter,
-  adminOnly = false,
 }: {
   title?: string;
   filter?: (p: Product) => boolean;
-  adminOnly?: boolean;
 }) {
   const { adminProducts, catalogError } = useShop();
   const [sort, setSort] = useState<"featured" | "price" | "price-desc" | "newest">("featured");
-  const source = adminOnly ? adminProducts : products;
+  const source = adminProducts;
   const filteredProducts = filter ? source.filter(filter) : source;
   const list = [...filteredProducts].sort((a, b) => {
     if (sort === "price") return a.price - b.price;
@@ -1642,7 +1639,7 @@ export function CatalogPage({
             <option value="newest">Newest</option>
           </select>
         </div>
-        {adminOnly && catalogError ? (
+        {catalogError ? (
           <p role="alert" className="py-12 text-center text-muted-foreground">Unable to load products. Please refresh the page to try again.</p>
         ) : list.length === 0 ? (
           <p className="py-12 text-center text-muted-foreground">No products available yet.</p>
@@ -1672,7 +1669,7 @@ export function PageHero({ title, copy }: { title: string; copy: string }) {
   );
 }
 export function ProductPage({ product }: { product: Product }) {
-  const { addToCart, toggleWishlist, isWishlisted } = useShop();
+  const { addToCart, toggleWishlist, isWishlisted, catalogProducts } = useShop();
   const [qty, setQty] = useState(1),
     [shade, setShade] = useState(product.shades?.[0]?.name),
     [variant, setVariant] = useState(product.variants?.[0]?.label),
@@ -1868,7 +1865,7 @@ export function ProductPage({ product }: { product: Product }) {
         <ProductSection
           title="You May Also Like"
           sub="More picks for your routine."
-          list={products
+          list={catalogProducts
             .filter((p) => p.category === product.category && p.id !== product.id)
             .slice(0, 4)}
         />

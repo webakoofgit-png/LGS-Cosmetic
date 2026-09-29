@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { toast } from "sonner";
-import { products, type Product } from "@/data/catalog";
+import { type Product } from "@/data/catalog";
 import { ADMIN_API_BASE, resolveImageUrl } from "@/lib/admin-api";
 
 export type CartLine = { id: string; qty: number; shade?: string | undefined; variant?: string | undefined };
@@ -46,14 +46,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [catalogVersion, refreshCatalog] = useState(0);
   const [catalogReady, setCatalogReady] = useState(false);
   const [adminProducts, setAdminProducts] = useState<Product[]>([]);
   const [catalogError, setCatalogError] = useState(false);
-  const catalogProducts = useMemo(() => [
-    ...adminProducts,
-    ...products.filter((product) => !adminProducts.some((remote) => remote.slug === product.slug)),
-  ], [adminProducts, catalogVersion]);
+  const catalogProducts = adminProducts;
 
   useEffect(() => {
     let active = true;
@@ -73,28 +69,6 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       .then((payload) => {
         if (!active || !Array.isArray(payload?.data)) return;
         setAdminProducts(payload.data.filter((item) => item.status === "Active").map(toStoreProduct));
-        const remoteBySlug = new Map(payload.data.map((item: any) => [item.slug, item]));
-        products.forEach((product) => {
-          const remote = remoteBySlug.get(product.slug);
-          if (!remote) return;
-          const remoteMain = String(remote.mainImage ?? "");
-          // Seeded brochure paths belong to the bundled catalog; keep the
-          // imported asset instead of replacing it with a non-existent URL.
-          const image = remoteMain && !remoteMain.startsWith("/assets/")
-            ? resolveImageUrl(remoteMain)
-            : product.image;
-          const gallery = parseRemoteList(remote.additionalImages);
-          product.image = image;
-          product.hoverImage = gallery[0] ? resolveImageUrl(gallery[0]) : image;
-          product.galleryImages = gallery
-            .filter((item: string) => !item.startsWith("/assets/"))
-            .map((item: string) => resolveImageUrl(item));
-          product.stock = Number(remote.stock ?? product.stock ?? 0);
-          product.inStock = remote.status !== "Inactive" && Number(remote.stock ?? 0) > 0;
-          const remoteVariants = parseRemoteJson(remote.variants);
-          if (Array.isArray(remoteVariants) && remoteVariants.length) product.variants = remoteVariants;
-        });
-        refreshCatalog((value) => value + 1);
       })
       .catch(() => { if (active) setCatalogError(true); })
       .finally(() => {
@@ -196,7 +170,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       }, 0),
       lines,
     };
-  }, [cart, wishlist, cartOpen, searchOpen, catalogVersion, adminProducts, catalogProducts, catalogError, addToCart, removeFromCart, setQty, toggleWishlist]);
+  }, [cart, wishlist, cartOpen, searchOpen, adminProducts, catalogProducts, catalogError, addToCart, removeFromCart, setQty, toggleWishlist]);
 
   return <ShopContext.Provider value={value}>{catalogReady ? children : <div className="grid min-h-screen place-items-center bg-[#f7f4ef] text-sm text-stone-500">Loading store...</div>}</ShopContext.Provider>;
 }
