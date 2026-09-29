@@ -24,7 +24,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import { announcements, formatINR, mapsUrl, site, whatsappUrl } from "@/data/site";
+import { announcements, formatINR, mapsEmbedUrl, mapsUrl, site, whatsappUrl } from "@/data/site";
 import {
   beautyNeeds,
   byTag,
@@ -81,7 +81,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 }
 
 function SocialFloatingButtons() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    setOpen(window.matchMedia("(min-width: 768px)").matches);
+  }, []);
 
   return (
     <div className="fixed bottom-5 right-4 z-40 flex flex-col items-end gap-3">
@@ -127,7 +130,7 @@ function SocialFloatingButtons() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-label={open ? "Hide social icons" : "Show social icons"}
-        className="grid size-8 place-items-center rounded-full bg-white text-[#21b6da] shadow-[0_8px_14px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition hover:scale-105"
+        className="grid size-11 place-items-center rounded-full bg-white text-[#21b6da] shadow-[0_8px_14px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition hover:scale-105"
       >
         <X size={15} strokeWidth={2.4} className={open ? "" : "rotate-45"} />
       </button>
@@ -174,7 +177,7 @@ function Header() {
       <header className="sticky top-0 z-40 border-b bg-ivory/95 backdrop-blur">
         <div className="container-lv flex h-[72px] items-center gap-4 lg:h-[84px]">
           <button
-            className="grid size-11 place-items-center lg:hidden"
+            className="grid size-11 shrink-0 place-items-center xl:hidden"
             onClick={() => setMenu(true)}
             aria-label="Open menu"
           >
@@ -227,7 +230,7 @@ function Header() {
             </button>
           </div>
         </div>
-        <nav className="hidden border-t bg-white lg:block">
+        <nav className="hidden border-t bg-white xl:block">
           <div className="container-lv flex h-11 items-center justify-center gap-6 overflow-hidden">
             {nav.map(([n, u]) => (
               <a
@@ -249,7 +252,7 @@ function Header() {
           >
             <div className="mb-8 flex items-center justify-between">
               <span className="font-display text-2xl font-bold text-wine">LUCKY</span>
-              <button className="grid size-11 place-items-center" onClick={() => setMenu(false)}>
+              <button aria-label="Close menu" className="grid size-11 place-items-center" onClick={() => setMenu(false)}>
                 <X />
               </button>
             </div>
@@ -263,6 +266,8 @@ function Header() {
                 <ArrowRight size={15} />
               </a>
             ))}
+            <a href="/account" className="flex min-h-12 items-center border-b text-sm font-semibold">Account</a>
+            <a href="/wishlist" className="flex min-h-12 items-center border-b text-sm font-semibold">Wishlist</a>
             <div className="mt-7 text-sm leading-7 text-muted-foreground">
               Need help?
               <br />
@@ -397,6 +402,7 @@ const heroes = [
   },
 ];
 export function HomePage() {
+  const { adminProducts } = useShop();
   type TrendKey = "skin" | "hair" | "lgs";
   const [slide, setSlide] = useState(0),
     [trend, setTrend] = useState<TrendKey>("skin");
@@ -404,10 +410,14 @@ export function HomePage() {
     const id = setInterval(() => setSlide((x) => (x + 1) % heroes.length), 6000);
     return () => clearInterval(id);
   }, []);
-  const trending = products.filter((p) => {
-    if (trend === "skin") return p.category === "skincare";
+  const trending = adminProducts.filter((p) => {
+    if (p.brand.trim().toLowerCase() !== "lgs") return false;
+    if (trend === "skin") {
+      return ["skincare", "skin-care", "face-care", "sun-care", "treatment-care"].includes(p.category)
+        || ["face care", "moisturizers", "skin care", "lgs skincare"].includes(p.type.trim().toLowerCase());
+    }
     if (trend === "hair") return p.category === "hair-care" || p.category === "hair-accessories";
-    return p.category === "lgs-products" || p.brand.toLowerCase() === "lgs";
+    return true;
   }).slice(0, 4);
   return (
     <>
@@ -510,7 +520,7 @@ export function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-wine-deep/90 to-transparent" />
           <div className="relative flex min-h-[440px] max-w-xl flex-col justify-center p-7 text-white sm:p-14">
             <p className="eyebrow !text-gold-soft">Made for every mood</p>
-            <h2 className="mt-4 text-5xl sm:text-6xl">Beauty That Feels Like You</h2>
+            <h2 className="mt-4 text-4xl sm:text-6xl">Beauty That Feels Like You</h2>
             <p className="mt-4 leading-7 text-white/80">
               From everyday essentials to festive glam — discover everything under one roof.
             </p>
@@ -554,7 +564,7 @@ export function HomePage() {
           <p className="eyebrow !text-gold">PROFESSIONAL BEAUTY</p>
           <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
             <div>
-              <h2 className="text-5xl sm:text-6xl">For Salon Professionals</h2>
+              <h2 className="text-4xl sm:text-6xl">For Salon Professionals</h2>
               <p className="mt-5 max-w-xl leading-7 text-white/70">
                 Professional products. Salon equipment. Wholesale solutions. Serving salon & beauty
                 professionals across Satara district.
@@ -651,7 +661,6 @@ export function HomePage() {
       <InstagramBlock />
       <Reviews />
       <StoreCta />
-      <Newsletter />
     </>
   );
 }
@@ -867,7 +876,6 @@ function VideoExperience() {
   );
 }
 function InstagramBlock() {
-  const fallbackImages = [storeShelf, heroFestive, cat(0), storeInterior, lgsCampaign, cat(2)];
   const [posts, setPosts] = useState<{ id: number; image: string; caption?: string | null; link?: string | null }[]>([]);
 
   useEffect(() => {
@@ -875,7 +883,7 @@ function InstagramBlock() {
     fetch(`${ADMIN_API_BASE}/api/instagram-posts`)
       .then((response) => (response.ok ? response.json() : null))
       .then((payload) => {
-        if (active && Array.isArray(payload?.data)) setPosts(payload.data.slice(0, 6));
+        if (active && Array.isArray(payload?.data)) setPosts(payload.data.slice(0, 12));
       })
       .catch(() => undefined);
     return () => {
@@ -883,29 +891,28 @@ function InstagramBlock() {
     };
   }, []);
 
-  const items = posts.length > 0
-    ? posts
-    : fallbackImages.map((image, index) => ({ id: index, image, caption: null, link: site.instagram }));
+  const items = posts;
+  if (!items.length) return null;
 
   return (
     <Section title="Follow Our Beauty World" sub={site.instagramHandle}>
-      <div className="grid grid-cols-3 gap-1 sm:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {items.map((post) => (
           <a
             href={post.link || site.instagram}
             target="_blank"
             rel="noreferrer"
-            className="group relative aspect-square overflow-hidden"
+            className="group relative aspect-[9/16] overflow-hidden bg-secondary"
             key={post.id}
           >
             <img
               src={resolveImageUrl(post.image)}
               alt={post.caption || "Lucky Varieties beauty inspiration"}
               loading="lazy"
-              className="h-full w-full object-cover transition group-hover:scale-105"
+              className="h-full w-full object-contain"
             />
-            <span className="absolute inset-0 grid place-items-center bg-wine/60 text-white opacity-0 transition group-hover:opacity-100">
-              <Instagram />
+            <span className="absolute bottom-0 inset-x-0 flex items-center justify-center gap-2 bg-black/65 px-2 py-3 text-xs text-white">
+              <Instagram size={16} /> View on Instagram
             </span>
           </a>
         ))}
@@ -941,7 +948,7 @@ function StoreCta() {
       <div className="grid bg-wine text-white lg:grid-cols-2">
         <div className="p-7 sm:p-12">
           <p className="eyebrow !text-gold">COME SAY HELLO</p>
-          <h2 className="mt-4 text-5xl">Visit Lucky Varieties Beauty Mall</h2>
+          <h2 className="mt-4 text-4xl sm:text-5xl">Visit Lucky Varieties Beauty Mall</h2>
           <p className="mt-5 leading-7 text-white/75">
             {site.address.line1}
             <br />
@@ -967,47 +974,20 @@ function StoreCta() {
             </a>
           </div>
         </div>
-        <div className="grid min-h-72 place-items-center bg-[radial-gradient(circle_at_center,#8c4050,#4b1521)]">
-          <MapPin size={50} className="text-gold" />
-          <span className="sr-only">Map area</span>
-        </div>
-      </div>
-    </section>
-  );
-}
-function Newsletter() {
-  return (
-    <section className="border-t bg-white py-12">
-      <div className="container-lv flex flex-col items-center justify-between gap-6 md:flex-row">
-        <div>
-          <h2 className="text-3xl text-wine">Glow With Us</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            New arrivals, beauty offers and festive collections.
-          </p>
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            toast.success("You're on the list");
-          }}
-          className="flex w-full max-w-lg"
-        >
-          <input
-            required
-            type="email"
-            aria-label="Email address"
-            placeholder="Your email address"
-            className="h-12 min-w-0 flex-1 border px-4 text-sm outline-none focus:border-wine"
+        <div className="min-h-72 bg-secondary">
+          <iframe
+            title="Lucky Varieties Beauty Mall location"
+            src={mapsEmbedUrl}
+            className="h-full min-h-72 w-full border-0"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
           />
-          <button className="bg-wine px-5 text-[10px] font-bold tracking-widest text-white">
-            SUBSCRIBE
-          </button>
-        </form>
+        </div>
       </div>
     </section>
   );
 }
-
 function Footer() {
   const columns = [
     {
@@ -1181,8 +1161,8 @@ export function AccountPage() {
 }
 
 export function WishlistPage() {
-  const { wishlist } = useShop();
-  const saved = products.filter((product) => wishlist.includes(product.id));
+  const { wishlist, catalogProducts } = useShop();
+  const saved = catalogProducts.filter((product) => wishlist.includes(product.id));
   return (
     <>
       <PageHero title="Your Wishlist" copy="All the beauty favourites you saved in one place." />
@@ -1527,7 +1507,7 @@ function CartDrawer() {
                   <p className="text-xs text-muted-foreground">
                     {line.variant || line.shade || product.subtitle}
                   </p>
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center border">
                       <button
                         onClick={() => setQty(product.id, line.qty - 1, line.shade, line.variant)}
@@ -1587,7 +1567,7 @@ function SearchOverlay() {
   const results = useMemo(() => searchProducts(q).slice(0, 6), [q]);
   if (!searchOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 bg-ivory">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-ivory pb-8">
       <div className="container-lv">
         <div className="flex h-20 items-center gap-3 border-b">
           <Search />
@@ -1604,9 +1584,9 @@ function SearchOverlay() {
         </div>
         <div className="mx-auto mt-10 max-w-4xl">
           <p className="eyebrow">{q ? `${results.length} RESULTS` : "POPULAR SEARCHES"}</p>
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {results.map((p) => (
-              <a href={`/product/${p.slug}`} className="flex gap-3 bg-white p-2" key={p.id}>
+              <a href={`/product/${p.slug}`} className="flex min-w-0 gap-3 bg-white p-2" key={p.id}>
                 <img src={p.image} className="size-20 object-cover" alt="" />
                 <div>
                   <p className="font-display text-lg leading-tight">{p.name}</p>
@@ -1624,12 +1604,16 @@ function SearchOverlay() {
 export function CatalogPage({
   title = "Shop All Beauty",
   filter,
+  adminOnly = false,
 }: {
   title?: string;
   filter?: (p: Product) => boolean;
+  adminOnly?: boolean;
 }) {
+  const { adminProducts, catalogError } = useShop();
   const [sort, setSort] = useState<"featured" | "price" | "price-desc" | "newest">("featured");
-  const filteredProducts = filter ? products.filter(filter) : products;
+  const source = adminOnly ? adminProducts : products;
+  const filteredProducts = filter ? source.filter(filter) : source;
   const list = [...filteredProducts].sort((a, b) => {
     if (sort === "price") return a.price - b.price;
     if (sort === "price-desc") return b.price - a.price;
@@ -1658,6 +1642,11 @@ export function CatalogPage({
             <option value="newest">Newest</option>
           </select>
         </div>
+        {adminOnly && catalogError ? (
+          <p role="alert" className="py-12 text-center text-muted-foreground">Unable to load products. Please refresh the page to try again.</p>
+        ) : list.length === 0 ? (
+          <p className="py-12 text-center text-muted-foreground">No products available yet.</p>
+        ) : null}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
           {list.map((p) => (
             <ProductCard p={p} key={p.id} />
@@ -1788,7 +1777,7 @@ export function ProductPage({ product }: { product: Product }) {
               </div>
             </div>
           )}
-          <div className="mt-8 flex flex-wrap gap-3 sm:flex-nowrap">
+          <div className="mt-8 flex flex-wrap gap-3">
             <div className="flex h-13 items-center border">
               <button
                 onClick={() => setQty(Math.max(1, qty - 1))}

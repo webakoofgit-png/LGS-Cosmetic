@@ -14,6 +14,9 @@ import { ADMIN_API_BASE, resolveImageUrl } from "@/lib/admin-api";
 export type CartLine = { id: string; qty: number; shade?: string | undefined; variant?: string | undefined };
 
 type ShopState = {
+  adminProducts: Product[];
+  catalogError: boolean;
+  catalogProducts: Product[];
   cart: CartLine[];
   wishlist: string[];
   cartOpen: boolean;
@@ -45,13 +48,31 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [catalogVersion, refreshCatalog] = useState(0);
   const [catalogReady, setCatalogReady] = useState(false);
+  const [adminProducts, setAdminProducts] = useState<Product[]>([]);
+  const [catalogError, setCatalogError] = useState(false);
+  const catalogProducts = useMemo(() => [
+    ...adminProducts,
+    ...products.filter((product) => !adminProducts.some((remote) => remote.slug === product.slug)),
+  ], [adminProducts, catalogVersion]);
 
   useEffect(() => {
     let active = true;
-    fetch(`${ADMIN_API_BASE}/api/products?limit=100`)
-      .then((response) => response.json())
+    async function loadProducts() {
+      const data = [];
+      for (let page = 1; ; page += 1) {
+        const response = await fetch(`${ADMIN_API_BASE}/api/products?limit=100&page=${page}`);
+        if (!response.ok) throw new Error("Unable to load products");
+        const payload = await response.json();
+        if (!Array.isArray(payload?.data)) throw new Error("Invalid products response");
+        data.push(...payload.data);
+        if (page >= (payload.pagination?.totalPages ?? 1)) break;
+      }
+      return { data };
+    }
+    loadProducts()
       .then((payload) => {
         if (!active || !Array.isArray(payload?.data)) return;
+        setAdminProducts(payload.data.filter((item) => item.status === "Active").map(toStoreProduct));
         const remoteBySlug = new Map(payload.data.map((item: any) => [item.slug, item]));
         products.forEach((product) => {
           const remote = remoteBySlug.get(product.slug);
@@ -75,7 +96,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         });
         refreshCatalog((value) => value + 1);
       })
-      .catch(() => undefined)
+      .catch(() => { if (active) setCatalogError(true); })
       .finally(() => {
         if (active) setCatalogReady(true);
       });
@@ -150,9 +171,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ShopState>(() => {
     const lines = cart
-      .map((line) => ({ line, product: products.find((p) => p.id === line.id)! }))
+      .map((line) => ({ line, product: catalogProducts.find((p) => p.id === line.id)! }))
       .filter((l) => Boolean(l.product));
     return {
+      adminProducts,
+      catalogProducts,
+      catalogError,
       cart,
       wishlist,
       cartOpen,
@@ -172,9 +196,30 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       }, 0),
       lines,
     };
-  }, [cart, wishlist, cartOpen, searchOpen, catalogVersion, addToCart, removeFromCart, setQty, toggleWishlist]);
+  }, [cart, wishlist, cartOpen, searchOpen, catalogVersion, adminProducts, catalogProducts, catalogError, addToCart, removeFromCart, setQty, toggleWishlist]);
 
   return <ShopContext.Provider value={value}>{catalogReady ? children : <div className="grid min-h-screen place-items-center bg-[#f7f4ef] text-sm text-stone-500">Loading store...</div>}</ShopContext.Provider>;
+}
+
+function toStoreProduct(remote: any): Product {
+  const image = resolveImageUrl(remote.mainImage) || "/placeholder.svg";
+  const galleryImages = parseRemoteList(remote.additionalImages).map(resolveImageUrl);
+  const variants = parseRemoteJson(remote.variants);
+  return {
+    id: `admin-${remote.id}`, slug: remote.slug, name: remote.name,
+    brand: remote.brand ?? "", category: remote.category?.slug ?? "",
+    type: remote.type ?? "", subtitle: remote.subtitle ?? remote.shortDescription ?? "",
+    price: Number(remote.salePrice ?? remote.price), mrp: Number(remote.price),
+    rating: Number(remote.rating ?? 0), reviews: Number(remote.reviews ?? 0),
+    image, hoverImage: galleryImages[0] || image, galleryImages,
+    variants: Array.isArray(variants) ? variants : [], size: remote.size ?? "",
+    stock: Number(remote.stock), inStock: Number(remote.stock) > 0,
+    tags: parseRemoteList(remote.tags).filter((tag): tag is Product["tags"][number] =>
+      ["bestseller", "new", "trending", "offer"].includes(tag)),
+    description: remote.description ?? "", howToUse: remote.usage ?? "",
+    benefits: parseRemoteList(remote.benefits), keyIngredients: parseRemoteList(remote.ingredients),
+    details: [],
+  };
 }
 
 function parseRemoteList(value: unknown): string[] {

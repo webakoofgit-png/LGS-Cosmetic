@@ -11,9 +11,9 @@ export const site = {
   phonesDisplay: ["+91 98609 64571"],
   whatsapp: "919860964571",
   facebook: "https://www.facebook.com/lgscosmetics",
-  instagram: "https://www.instagram.com/lgscosmetics/",
-  instagramHandle: "@lgscosmetics",
-  mapsLink: "https://share.google/6fr8aVZz1wQB4cWsl",
+  instagram: "https://www.instagram.com/lgs_cosmetics/",
+  instagramHandle: "@lgs_cosmetics",
+  mapsLink: "https://share.google/YmYaSZZRk0ry1wlFN",
   mapsQuery:
     "Lucky+Varieties+Beauty+Mall,+Koregaon-Rahimatpur+Road,+Near+Police+Station,+Koregaon,+Maharashtra+415501",
 } as const;

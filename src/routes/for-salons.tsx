@@ -17,7 +17,7 @@ function Page() {
         <div className="container-lv grid gap-10 lg:grid-cols-2">
           <div>
             <p className="eyebrow !text-gold">WHOLESALE ENQUIRY</p>
-            <h2 className="mt-3 text-5xl">Let's grow your salon together.</h2>
+            <h2 className="mt-3 text-4xl sm:text-5xl">Let's grow your salon together.</h2>
             <p className="mt-5 text-sm leading-7 text-white/65">
               Tell us what you need and our store team will contact you with availability and
               pricing.

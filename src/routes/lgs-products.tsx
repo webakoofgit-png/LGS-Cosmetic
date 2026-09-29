@@ -3,7 +3,7 @@ import { AppShell, CatalogPage } from "@/components/commerce";
 export const Route = createFileRoute("/lgs-products")({
   component: () => (
     <AppShell>
-      <CatalogPage title="Discover LGS" filter={(p) => p.brand === "LGS"} />
+      <CatalogPage title="Discover LGS" adminOnly filter={(p) => p.brand.trim().toLowerCase() === "lgs" || p.category === "lgs-products"} />
     </AppShell>
   ),
 });
