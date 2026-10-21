@@ -21,6 +21,8 @@ DEPLOY_TARGET explicitly selects Nitro's Node server preset. Without it, the exi
 
 Create another Node.js Web App from the same repository. Use root backend, Node 22.x, Express (or Other), package manager npm and entry server.js. The API is plain JavaScript and has no compilation step; use the provider's no-build setting. If a build command is mandatory, use node --check server.js. Publish the backend root, not the frontend .output directory.
 
+The backend has its own package-lock.json and is deliberately not an npm workspace. This keeps sequelize and all API dependencies inside backend/node_modules when Hostinger publishes only the selected root directory. Use npm ci in backend; root installation also installs the backend through its postinstall script for local development.
+
 Set these backend-only environment variables through Hostinger:
 
 ```
