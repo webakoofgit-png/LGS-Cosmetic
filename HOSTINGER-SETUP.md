@@ -17,6 +17,8 @@ The storefront is TanStack Start/Nitro SSR. The API is a separate Express/MySQL 
 
 DEPLOY_TARGET explicitly selects Nitro's Node server preset. Without it, the existing Lovable/Cloudflare build remains available. Do not use the Cloudflare worker output as a Node server.
 
+Hostinger builds send browser requests to same-origin /api and /uploads paths. Nitro forwards those paths to the fixed VITE_API_URL backend configured at build time. This avoids cross-domain browser CORS and third-party session cookie restrictions. Keep VITE_API_URL set to the actual backend origin and rebuild after changing it. There is no API response caching; login cookies and admin authorization are forwarded by the proxy.
+
 ## API app
 
 Create another Node.js Web App from the same repository. Use root backend, Node 22.x, Express (or Other), package manager npm and entry server.js. The API is plain JavaScript and has no compilation step; use the provider's no-build setting. If a build command is mandatory, use node --check server.js. Publish the backend root, not the frontend .output directory.
@@ -41,7 +43,7 @@ RESEND_ENABLED=false
 RESEND_DOMAIN_VERIFIED=false
 ```
 
-Hostinger supplies the listening PORT; do not set localhost:5000 as the public API URL. After creating the API app, rebuild the storefront with its real HTTPS VITE_API_URL. Use storefront/API subdomains of the same domain for cookie sessions, e.g. shop.example.com and api.example.com. On unrelated temporary domains browser third-party cookie restrictions can prevent customer sessions; use same-site domains before customer authentication acceptance testing.
+Hostinger supplies the listening PORT; do not set localhost:5000 as the public API URL. After creating the API app, rebuild the storefront with its real HTTPS VITE_API_URL. Browser requests use the storefront proxy, including customer session requests. FRONTEND_URL on the backend must match the storefront origin for authentication origin checks. Before using live domains, verify login/session cookies, checkout and admin updates through the proxy.
 
 Create the database first. Backend startup creates application and customer-auth tables. Import the existing local MySQL data securely if you want the existing products, categories and content; the Git repository does not contain the database. Do not run the development seed script blindly on production. Keep uploads on persistent storage or restore them after deployments; verify Hostinger upload persistence before taking customer orders.
 

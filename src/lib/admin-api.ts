@@ -1,6 +1,7 @@
 export const ADMIN_API_BASE =
-  import.meta.env['VITE_API_URL']?.replace(/\/$/, "") ??
-  (import.meta.env.DEV ? "http://localhost:5000" : "");
+  import.meta.env['VITE_API_MODE'] === 'same-origin' ? "" :
+  (import.meta.env['VITE_API_URL']?.trim().replace(/\/+$/, "") ??
+  (import.meta.env.DEV ? "http://localhost:5000" : ""));
 
 /** Resolve uploaded backend files while keeping bundled frontend assets local. */
 export function resolveImageUrl(value: string | null | undefined) {
