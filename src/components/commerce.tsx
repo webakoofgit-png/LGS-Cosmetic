@@ -21,26 +21,40 @@ import {
   BadgeCheck,
   Facebook,
   Youtube,
+  Droplets,
+  Sun,
+  Wind,
+  Waves,
   type LucideIcon,
 } from "lucide-react";
+import { CustomerAccountPage } from "@/components/customer-account";
+import { CustomerCheckout } from "@/components/customer-checkout";
+import { ReviewSlider } from "@/components/review-slider";
 import { Toaster, toast } from "sonner";
-import { announcements, formatINR, mapsEmbedUrl, mapsUrl, site, whatsappUrl } from "@/data/site";
+import { announcements, formatINR } from "@/data/site";
+import { useSiteSettings } from "@/lib/general-settings";
 import {
   beautyNeeds,
   categoryBySlug,
-  categories,
   discountOf,
   type Product,
 } from "@/data/catalog";
+import { useLocation } from "@tanstack/react-router";
+import { usePageContent } from "@/lib/site-settings";
+import { useStoreCategories } from "@/lib/store-categories";
 import { ShopProvider, useShop } from "@/lib/shop-store";
 import { ADMIN_API_BASE, resolveImageUrl } from "@/lib/admin-api";
 import heroGlow from "@/assets/hero-glow.jpg";
-import heroLgs from "@/assets/carousel-3.png";
-import heroSalon from "@/assets/hero-salon.jpg";
 import heroFestive from "@/assets/hero_festive.png";
 import promo from "@/assets/LCS_banner.png";
+import beautyBanner from "@/assets/LGS Fairness Cream Beauty Display.png";
+import dtanBanner from "@/assets/LGS D-TAN Skincare in Botanical Light.png";
+import faceBarBanner from "@/assets/Luxury Anti-Blemishing Face Bar Display.png";
+import storeShowcase from "@/assets/LGS Cosmetics Store Showcase.png";
+import storeAisle from "@/assets/LGS Cosmetics Aisle Display.png";
 import lgsCampaign from "@/assets/lgs-campaign.jpg";
 import lgsLogo from "@/assets/lgs_logo.png";
+import breadcrumbImage from "@/assets/lgs_breadcrub.png";
 import storeFront from "@/assets/store-front.jpg";
 import storeInterior from "@/assets/store-interior.jpg";
 import storeShelf from "@/assets/store-shelf.jpg";
@@ -55,12 +69,8 @@ const nav = [
   ["Best Sellers", "/best-sellers"],
   ["Shop", "/shop"],
   ["LGS Products", "/lgs-products"],
-  ["Makeup", "/shop/makeup"],
-  ["Skincare", "/shop/skincare"],
-  ["Nail Care", "/shop/nail-care"],
-  ["Jewellery", "/shop/jewellery"],
-  ["Offers", "/offers"],
-  ["For Salons", "/for-salons"],
+  ["Blog", "/blog"],
+  ["Contact", "/contact"],
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -80,47 +90,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 function SocialFloatingButtons() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    setOpen(window.matchMedia("(min-width: 768px)").matches);
+    const media = window.matchMedia("(min-width: 768px)");
+    const update = () => setOpen(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   return (
-    <div className="fixed bottom-5 right-4 z-40 flex flex-col items-end gap-3">
+    <div className="fixed bottom-5 right-4 z-40 flex flex-col items-center gap-3">
       {open && (
-        <div className="flex flex-col items-end gap-3">
-          <a
-            href={site.instagram}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open Instagram"
-            className="grid size-10 place-items-center rounded-full bg-[#f95b9c] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] transition hover:scale-105"
-          >
-            <Instagram size={15} strokeWidth={2.4} />
-          </a>
-          <a
-            aria-label="Open Facebook"
-            href={site.facebook}
-            target="_blank"
-            rel="noreferrer"
-            className="grid size-10 place-items-center rounded-full bg-[#4c6faf] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
-          >
-            <Facebook size={15} strokeWidth={2.4} />
-          </a>
-          <button
-            type="button"
-            aria-label="YouTube link coming soon"
-            className="grid size-10 place-items-center rounded-full bg-[#ea4335] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
-          >
-            <Youtube size={15} strokeWidth={2.4} />
-          </button>
-          <a
-            aria-label="Open WhatsApp"
-            href={whatsappUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="grid size-10 place-items-center rounded-full bg-[#25d366] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
-          >
-            <WhatsAppGlyph />
-          </a>
+        <div className="flex flex-col items-center gap-3">
+          <SocialIcons />
         </div>
       )}
       <button
@@ -143,9 +124,51 @@ function SocialFloatingButtons() {
   );
 }
 
+function SocialIcons({ footer = false }: { footer?: boolean }) {
+  const { site, whatsappUrl } = useSiteSettings();
+  return (
+    <>
+          <a
+            href={site.instagram}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Instagram"
+            className="grid size-10 place-items-center rounded-full bg-[#f95b9c] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] transition hover:scale-105"
+          >
+            <Instagram size={15} strokeWidth={2.4} />
+          </a>
+          <a
+            aria-label="Open Facebook"
+            href={site.facebook}
+            target="_blank"
+            rel="noreferrer"
+            className="grid size-10 place-items-center rounded-full bg-[#4c6faf] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
+          >
+            <Facebook size={15} strokeWidth={2.4} />
+          </a>
+          {!footer && <button
+            type="button"
+            aria-label="YouTube link coming soon"
+            className="grid size-10 place-items-center rounded-full bg-[#ea4335] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] opacity-95 transition hover:scale-105"
+          >
+            <Youtube size={15} strokeWidth={2.4} />
+          </button>}
+          {!footer && <a
+            aria-label="Open WhatsApp"
+            href={whatsappUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="grid size-10 shrink-0 place-items-center rounded-full bg-[#25d366] text-white shadow-[0_10px_18px_rgba(0,0,0,0.18)] ring-2 ring-white transition hover:scale-105 hover:bg-[#1fbd59] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#25d366]"
+          >
+            <WhatsAppGlyph />
+          </a>}
+    </>
+  );
+}
+
 function WhatsAppGlyph() {
   return (
-    <svg viewBox="0 0 32 32" aria-hidden="true" className="size-[17px]">
+    <svg viewBox="0 0 32 32" aria-hidden="true" className="block size-6 shrink-0">
       <path
         fill="currentColor"
         d="M19.11 17.23c-.28-.14-1.65-.81-1.9-.9-.26-.1-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.18-.44-2.25-1.4-.83-.74-1.38-1.67-1.54-1.95-.16-.28-.02-.43.12-.57.12-.12.28-.32.42-.48.14-.16.19-.28.28-.46.09-.18.05-.35-.02-.49-.07-.14-.63-1.52-.86-2.08-.23-.54-.46-.47-.63-.48l-.53-.01c-.18 0-.49.07-.75.35-.26.28-1.01.99-1.01 2.42 0 1.42 1.03 2.79 1.17 2.98.14.19 2.04 3.11 4.94 4.36.69.29 1.23.46 1.65.59.69.22 1.31.19 1.8.12.55-.08 1.65-.67 1.88-1.32.23-.65.23-1.21.16-1.32-.07-.11-.26-.18-.54-.32z"
@@ -159,6 +182,7 @@ function WhatsAppGlyph() {
 }
 
 function Header() {
+  const { site } = useSiteSettings();
   const [notice, setNotice] = useState(0),
     [menu, setMenu] = useState(false);
   const { cartCount, setCartOpen, setSearchOpen, wishlist } = useShop();
@@ -180,10 +204,10 @@ function Header() {
           >
             <Menu />
           </button>
-          <a href="/" className="min-w-fit" aria-label="Lucky Varieties Beauty Mall home">
+          <a href="/" className="min-w-fit" aria-label={`${site.name} home`}>
             <img
               src={lgsLogo}
-              alt="Lucky Varieties Beauty Mall"
+              alt={site.name}
               className="h-11 w-auto sm:h-12 lg:h-14"
             />
           </a>
@@ -248,7 +272,7 @@ function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-8 flex items-center justify-between">
-              <span className="font-display text-2xl font-bold text-wine">LUCKY</span>
+              <span className="font-display text-2xl font-bold text-wine">{site.name}</span>
               <button aria-label="Close menu" className="grid size-11 place-items-center" onClick={() => setMenu(false)}>
                 <X />
               </button>
@@ -366,39 +390,26 @@ export function ProductCard({ p }: { p: Product }) {
 
 const heroes = [
   {
-    image: heroGlow,
-    kicker: "Beauty, curated for you",
-    title: "Glow Starts Here",
-    copy: "Discover beauty, skincare and self-care for your everyday glow.",
-    cta: "SHOP NOW",
-    to: "/shop",
+    image: dtanBanner,
+    kicker: "Your skin care ritual",
+    title: "Refresh Your Skin Routine",
+    copy: "Explore the LGS D-Tan collection and make time for a little self-care.",
+    cta: "DISCOVER D-TAN CARE",
+    to: "/shop?need=sun-dtan-care",
+    light: true,
   },
   {
-    image: heroLgs,
-    kicker: "Our own collection",
-    title: "Discover LGS Beauty",
-    copy: "Thoughtful everyday skincare, made to belong in your routine.",
-    cta: "EXPLORE LGS",
-    to: "/lgs-products",
-  },
-  {
-    image: heroSalon,
-    kicker: "Retail & wholesale",
-    title: "Everything Your Salon Needs",
-    copy: "Professional equipment, machines and beauty supplies under one roof.",
-    cta: "FOR SALONS",
-    to: "/for-salons",
-  },
-  {
-    image: heroFestive,
-    kicker: "Celebrate your glow",
-    title: "Festive Beauty Edit",
-    copy: "Statement colour, sparkling accessories and gifting-ready favourites.",
-    cta: "VIEW OFFERS",
-    to: "/offers",
+    image: faceBarBanner,
+    kicker: "Everyday cleansing, by LGS",
+    title: "A Fresh Start for Your Skin",
+    copy: "Discover LGS Anti Blemishing Face Bar for your daily cleansing routine.",
+    cta: "EXPLORE FACE BAR",
+    to: "/product/anti-blemishing-face-bar",
+    light: false,
   },
 ];
 export function HomePage() {
+  const heroTouchStart = useRef<number | null>(null);
   const { adminProducts } = useShop();
   type TrendKey = "skin" | "hair" | "lgs";
   const [slide, setSlide] = useState(0),
@@ -418,32 +429,35 @@ export function HomePage() {
   }).slice(0, 4);
   return (
     <>
-      <section className="relative min-h-[540px] overflow-hidden bg-wine-deep min-[375px]:min-h-[570px] sm:min-h-[680px] lg:min-h-[calc(100vh-163px)]">
+      <section aria-label="LGS featured collections" aria-roledescription="carousel" className="relative isolate grid overflow-hidden bg-wine-deep md:h-[480px] lg:aspect-[2.77/1] lg:h-auto lg:min-h-[420px]" onTouchStart={(event) => { heroTouchStart.current = event.touches[0]?.clientX ?? null; }} onTouchEnd={(event) => { const start = heroTouchStart.current; const end = event.changedTouches[0]?.clientX; if (start !== null && end !== undefined && Math.abs(end - start) > 50) setSlide((value) => (value + (end < start ? 1 : heroes.length - 1)) % heroes.length); heroTouchStart.current = null; }}>
         {heroes.map((h, i) => (
           <div
             key={h.title}
-            className={`absolute inset-0 transition-opacity duration-1000 ${i === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}
+            aria-hidden={i !== slide}
+            className={`relative col-start-1 row-start-1 min-w-0 transition-opacity duration-1000 ${h.light ? "bg-[#fbf0e4]" : "bg-[#4b0c1c]"} ${i === slide ? "opacity-100" : "pointer-events-none opacity-0"}`}
           >
             <img
               src={h.image}
               alt={h.title}
-              className={`h-full w-full object-cover transition-transform duration-[7000ms] ${i === slide ? "scale-105" : "scale-100"}`}
+              fetchPriority={i === 0 ? "high" : "auto"}
+              className="block aspect-[8/5] w-full object-cover object-right md:absolute md:inset-0 md:aspect-auto md:h-full md:object-center"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
-            <div className="container-lv absolute inset-0 flex items-center">
-              <div className="w-[calc(100vw-2rem)] max-w-xl text-white sm:w-auto">
-                <p className="text-xs font-bold uppercase tracking-[.25em] text-gold-soft">
+            <div className={`absolute inset-0 hidden md:block ${h.light ? "bg-[linear-gradient(90deg,rgba(251,240,228,0.65),rgba(251,240,228,0.15)_38%,transparent_53%)]" : "bg-[linear-gradient(90deg,rgba(75,12,28,0.55),rgba(75,12,28,0.25)_35%,transparent_55%)]"}`} />
+            <div className="container-lv relative flex items-center pt-7 pb-16 md:absolute md:inset-0 md:py-0">
+              <div className={`w-full min-w-0 max-w-xl md:w-[48%] ${h.light ? "text-wine" : "text-white"}`}>
+                <p className={`text-xs font-bold uppercase tracking-[.16em] sm:tracking-[.22em] ${h.light ? "text-wine/75" : "text-gold-soft"}`}>
                   {h.kicker}
                 </p>
-                <h1 className="mt-4 max-w-[310px] text-[2.65rem] leading-[.94] min-[375px]:text-5xl sm:max-w-xl sm:text-7xl lg:text-8xl">
+                <h1 className="mt-3 max-w-md text-[clamp(2rem,8vw,2.5rem)] leading-[1.1] md:text-5xl xl:text-6xl">
                   {h.title}
                 </h1>
-                <p className="mt-5 max-w-[310px] text-sm leading-6 text-white/85 min-[375px]:max-w-sm sm:max-w-md sm:text-base sm:leading-7">
+                <p className="mt-4 max-w-sm text-[15px] leading-6 opacity-85 md:text-base md:leading-7">
                   {h.copy}
                 </p>
                 <a
                   href={h.to}
-                  className="mt-8 inline-flex h-12 items-center gap-5 bg-white px-7 text-xs font-bold tracking-[.15em] text-wine"
+                  tabIndex={i === slide ? 0 : -1}
+                  className={`mt-6 inline-flex min-h-12 max-w-full items-center justify-center gap-3 px-5 py-3 text-xs font-bold tracking-[.08em] ${h.light ? "bg-wine text-white" : "bg-white text-wine"}`}
                 >
                   {h.cta}
                   <ArrowRight size={16} />
@@ -453,173 +467,79 @@ export function HomePage() {
           </div>
         ))}
         <button
-          onClick={() => setSlide((slide + 3) % 4)}
-          className="absolute left-4 top-1/2 hidden size-12 place-items-center border border-white/40 text-white lg:grid"
+          onClick={() => setSlide((value) => (value + heroes.length - 1) % heroes.length)}
+          aria-label="Previous banner"
+          className="absolute bottom-6 left-4 hidden size-12 place-items-center border border-white/40 bg-black/15 text-white lg:grid"
         >
           <ChevronLeft />
         </button>
         <button
-          onClick={() => setSlide((slide + 1) % 4)}
-          className="absolute right-4 top-1/2 hidden size-12 place-items-center border border-white/40 text-white lg:grid"
+          onClick={() => setSlide((value) => (value + 1) % heroes.length)}
+          aria-label="Next banner"
+          className="absolute bottom-6 right-4 hidden size-12 place-items-center border border-white/40 bg-black/15 text-white lg:grid"
         >
           <ChevronRight />
         </button>
-        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center md:bottom-3">
           {heroes.map((_, i) => (
             <button
               key={i}
               onClick={() => setSlide(i)}
-              className={`h-1.5 rounded-full transition-all ${i === slide ? "w-8 bg-gold" : "w-2 bg-white/60"}`}
+              className="grid size-11 place-items-center"
               aria-label={`Slide ${i + 1}`}
-            />
+              aria-pressed={i === slide}
+            ><span className={`block h-1.5 rounded-full transition-all ${i === slide ? "w-7 bg-gold" : "w-2 bg-gold/50"}`} /></button>
           ))}
         </div>
       </section>
-      <Section title="Glam Yourself" sub="Everything you need for your perfect beauty routine.">
-        <div className="swipe-row -mx-4 gap-3 px-4 md:mx-0 md:grid md:grid-cols-4 md:px-0">
-          {categories.map((c) => (
-            <a
-              href={c.slug === "lgs-products" ? "/lgs-products" : `/shop/${c.slug}`}
-              className="group relative w-[68vw] max-w-[280px] overflow-hidden md:w-auto md:max-w-none"
-              key={c.slug}
-            >
-              <div className="aspect-[4/5] overflow-hidden">
-                <img
-                  src={c.image}
-                  alt={c.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-5 pt-16 text-white">
-                <h3 className="text-2xl">{c.name}</h3>
-                <span className="mt-1 flex items-center gap-2 text-[10px] font-bold tracking-wider">
-                  SHOP NOW <ArrowRight size={13} />
-                </span>
-              </div>
-            </a>
-          ))}
-        </div>
-      </Section>
       <ProductSection
         title="Our Best Sellers"
         sub="The beauty favourites customers return for."
+        hideHeading
         list={adminProducts.filter((p) => p.tags.includes("bestseller")).slice(0, 6)}
       />
-      <section className="w-full py-8">
-        <div className="relative min-h-[440px] overflow-hidden">
-          <img
-            src={promo}
-            alt="Beauty collection"
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-wine-deep/90 to-transparent" />
-          <div className="relative flex min-h-[440px] max-w-xl flex-col justify-center p-7 text-white sm:p-14">
-            <p className="eyebrow !text-gold-soft">Made for every mood</p>
-            <h2 className="mt-4 text-4xl sm:text-6xl">Beauty That Feels Like You</h2>
-            <p className="mt-4 leading-7 text-white/80">
-              From everyday essentials to festive glam — discover everything under one roof.
-            </p>
-            <a
-              href="/shop"
-              className="mt-7 flex w-fit items-center gap-3 border-b border-gold pb-2 text-xs font-bold tracking-widest"
-            >
-              EXPLORE COLLECTION <ArrowRight size={15} />
-            </a>
-          </div>
-        </div>
-      </section>
       <ProductSection
-        title="Just In"
+        title="New Arrivals"
         sub="Fresh beauty picks you'll love."
         list={adminProducts.filter((p) => p.tags.includes("new")).slice(0, 6)}
       />
       <Section title="Shop by Beauty Need">
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-          {beautyNeeds.map((x) => (
-            <a href={x.to} className="group relative aspect-[4/3] overflow-hidden" key={x.title}>
-              <img
-                src={x.image}
-                alt={x.title}
-                loading="lazy"
-                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/25" />
-              <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-7">
-                <h3 className="text-xl sm:text-3xl">{x.title}</h3>
-                <span className="mt-2 block text-[10px] font-bold tracking-widest opacity-0 transition group-hover:opacity-100">
-                  SHOP NOW →
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+          {beautyNeeds.map((need, index) => {
+            const Icon = [Droplets, Sun, Wind, Waves][index] ?? Droplets;
+            const palette = ["bg-[#f7e9e4] text-[#8a4945]", "bg-[#faf0da] text-[#94702c]", "bg-[#eaf0e4] text-[#526849]", "bg-[#e8eef3] text-[#4c697e]"][index];
+            return (
+              <a href={need.to} key={need.slug} className={`group flex h-full flex-col items-center rounded-2xl border border-black/5 px-4 py-7 text-center transition duration-200 hover:-translate-y-1 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-wine sm:px-6 sm:py-9 ${palette}`}>
+                <span className="mb-5 grid size-16 place-items-center rounded-full border border-current/10 bg-white/65 sm:size-20">
+                  <Icon className="size-8 sm:size-10" strokeWidth={1.3} aria-hidden="true" />
                 </span>
-              </div>
-            </a>
-          ))}
+                <h3 className="flex min-h-14 items-center justify-center text-xl leading-7 sm:text-2xl">{need.title}</h3>
+                <p className="mt-3 max-w-52 flex-1 text-xs leading-6 opacity-80 sm:text-sm">{need.description}</p>
+                <span className="mt-6 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.12em] sm:text-xs">
+                  Explore <ArrowRight size={14} aria-hidden="true" className="transition-transform group-hover:translate-x-1" />
+                </span>
+              </a>
+            );
+          })}
         </div>
       </Section>
-      <section className="bg-wine-deep py-16 text-white">
-        <div className="container-lv">
-          <p className="eyebrow !text-gold">PROFESSIONAL BEAUTY</p>
-          <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
-            <div>
-              <h2 className="text-4xl sm:text-6xl">For Salon Professionals</h2>
-              <p className="mt-5 max-w-xl leading-7 text-white/70">
-                Professional products. Salon equipment. Wholesale solutions. Serving salon & beauty
-                professionals across Satara district.
-              </p>
-              <div className="mt-7 flex flex-wrap gap-3">
-                <a
-                  href="/for-salons"
-                  className="bg-gold px-6 py-4 text-xs font-bold text-wine-deep"
-                >
-                  EXPLORE SALON SUPPLIES
-                </a>
-                <a
-                  href={whatsappUrl}
-                  className="border border-white/40 px-6 py-4 text-xs font-bold"
-                >
-                  GET WHOLESALE QUOTE
-                </a>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-px bg-white/15">
-              {[
-                "Salon Chairs",
-                "Hydra Facial Machines",
-                "Beauty Equipment",
-                "Wholesale Supplies",
-              ].map((x) => (
-                <div className="bg-wine p-5 text-sm sm:p-8" key={x}>
-                  <ArrowRight className="mb-8 text-gold" />
-                  <h3 className="text-xl">{x}</h3>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
       <Section
         eyebrow="KOREGAON'S BEAUTY DESTINATION"
         title="More Than a Beauty Store"
-        sub="Discover hundreds of beauty, personal care and salon products under one roof."
+        sub="Discover hundreds of beauty and personal care products under one roof."
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2">
           <img
-            src={storeFront}
-            alt="Lucky Varieties storefront"
+            src={storeShowcase}
+            alt="LGS Cosmetics store showcase and product collections"
             loading="lazy"
-            className="h-80 w-full object-cover lg:col-span-2"
+            className="aspect-[3/2] w-full rounded-xl object-cover"
           />
           <img
-            src={storeInterior}
-            alt="Store interior"
+            src={storeAisle}
+            alt="LGS Cosmetics product shelves and store aisle"
             loading="lazy"
-            className="h-80 w-full object-cover"
-          />
-          <img
-            src={storeShelf}
-            alt="Beauty product displays"
-            loading="lazy"
-            className="h-80 w-full object-cover"
+            className="aspect-[3/2] w-full rounded-xl object-cover"
           />
         </div>
         <a
@@ -629,7 +549,6 @@ export function HomePage() {
           VISIT OUR STORE <ArrowRight size={15} />
         </a>
       </Section>
-      <VideoExperience />
       <Section title="Trending Now">
         <div className="mb-8 flex gap-5 overflow-x-auto border-b">
           {(
@@ -656,7 +575,31 @@ export function HomePage() {
       </Section>
       <Why />
       <InstagramBlock />
-      <Reviews />
+      <ReviewSlider />
+      <section aria-label="LGS beauty collection" className="w-full py-8">
+        <div className="relative overflow-hidden bg-[#4b0c1c] md:min-h-[440px]">
+          <img
+            src={beautyBanner}
+            alt="LGS Fairness Cream beauty collection"
+            loading="lazy"
+            className="block aspect-[8/5] w-full object-cover object-right md:absolute md:inset-0 md:aspect-auto md:h-full md:object-center"
+          />
+          <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,rgba(75,12,28,0.55)_0%,rgba(75,12,28,0.45)_28%,rgba(75,12,28,0.12)_45%,transparent_58%)] md:block" />
+          <div className="relative flex max-w-xl flex-col justify-center p-6 text-white sm:p-8 md:min-h-[440px] md:w-[48%] md:p-12">
+            <p className="eyebrow !text-gold-soft">Made for every mood</p>
+            <h2 className="mt-4 text-3xl sm:text-4xl lg:text-6xl">Beauty That Feels Like You</h2>
+            <p className="mt-4 leading-7 text-white/80">
+              From everyday essentials to festive glam — discover everything under one roof.
+            </p>
+            <a
+              href="/shop"
+              className="mt-7 flex w-fit items-center gap-3 border-b border-gold pb-2 text-xs font-bold tracking-widest"
+            >
+              EXPLORE COLLECTION <ArrowRight size={15} />
+            </a>
+          </div>
+        </div>
+      </section>
       <StoreCta />
     </>
   );
@@ -688,24 +631,29 @@ function Section({
     </section>
   );
 }
-function ProductSection({ title, sub, list }: { title: string; sub: string; list: Product[] }) {
-  return (
-    <Section title={title} sub={sub}>
-      <div className="swipe-row -mx-4 gap-3 px-4 md:mx-0 md:grid md:grid-cols-3 md:px-0 lg:grid-cols-6">
+function ProductSection({ title, sub, list, hideHeading = false }: { title: string; sub: string; list: Product[]; hideHeading?: boolean }) {
+  const content = (
+      <div
+        role="region"
+        aria-label={`${title} products`}
+        tabIndex={0}
+        className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pb-4 [scroll-padding-inline:1rem] [scrollbar-color:var(--wine)_transparent] [scrollbar-width:thin] [-webkit-overflow-scrolling:touch] md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:grid-cols-6"
+      >
         {list.map((p) => (
-          <div className="w-[calc((100vw-2.75rem)/2)] max-w-none md:w-auto" key={p.id}>
+          <div className="w-[70%] shrink-0 snap-start min-[375px]:w-[46%] sm:w-[31%] md:w-auto" key={p.id}>
             <ProductCard p={p} />
           </div>
         ))}
       </div>
-    </Section>
   );
+  if (hideHeading) return list.length > 0 ? <section aria-label={title} className="container-lv overflow-hidden py-8">{content}</section> : null;
+  return <Section title={title} sub={sub}>{content}</Section>;
 }
 function Why() {
   const items: [LucideIcon, string, string][] = [
     [BadgeCheck, "Wide Beauty Collection", "Everyday beauty to professional supplies."],
     [ShieldCheck, "Quality & Trust", "Products selected with care."],
-    [ShoppingBag, "Retail + Wholesale", "Solutions for customers and salons."],
+    [ShoppingBag, "Retail + Wholesale", "Beauty essentials for every customer."],
     [MapPin, "Local Destination", "Conveniently in Koregaon, Satara."],
   ];
   return (
@@ -723,156 +671,8 @@ function Why() {
   );
 }
 
-function VideoExperience() {
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const scrollReels = (direction: -1 | 1) => {
-    sliderRef.current?.scrollBy({
-      left: direction * Math.min(sliderRef.current.clientWidth * 0.82, 760),
-      behavior: "smooth",
-    });
-  };
-  const reels = [
-    {
-      title: "Everyday Glow Routine",
-      label: "SKINCARE",
-      image: cat(1),
-      video: "/reels/everyday-glow.mp4",
-    },
-    {
-      title: "Festive Glam Edit",
-      label: "MAKEUP",
-      image: heroFestive,
-      video: "/reels/festive-glam.mp4",
-    },
-    {
-      title: "Discover LGS Care",
-      label: "LGS BEAUTY",
-      image: lgsCampaign,
-      video: "/reels/lgs-care.mp4",
-    },
-    {
-      title: "Perfect Nails",
-      label: "NAIL CARE",
-      image: cat(2),
-      video: "/reels/perfect-nails.mp4",
-    },
-    {
-      title: "Jewellery Styling",
-      label: "ACCESSORIES",
-      image: cat(5),
-      video: "/reels/jewellery-styling.mp4",
-    },
-    {
-      title: "Inside Our Beauty Mall",
-      label: "STORE TOUR",
-      image: storeInterior,
-      video: "/reels/store-tour.mp4",
-    },
-  ];
-  return (
-    <section className="bg-[#f5edf0] py-14 sm:py-20">
-      <div className="container-lv">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="eyebrow">BEAUTY IN MOTION</p>
-            <h2 className="mt-3 text-4xl text-wine sm:text-5xl">Glam in Action</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Watch beauty, products and the Lucky Varieties experience come alive.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <a
-              href={site.instagram}
-              target="_blank"
-              rel="noreferrer"
-              className="mr-2 inline-flex w-fit items-center gap-2 border-b border-wine pb-2 text-xs font-bold tracking-widest text-wine"
-            >
-              VIEW ALL REELS <ArrowRight size={15} />
-            </a>
-            <button
-              type="button"
-              onClick={() => scrollReels(-1)}
-              className="grid size-11 place-items-center border border-wine text-wine transition hover:bg-wine hover:text-white"
-              aria-label="Previous reels"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollReels(1)}
-              className="grid size-11 place-items-center bg-wine text-white transition hover:bg-wine-deep"
-              aria-label="Next reels"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-        </div>
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => scrollReels(-1)}
-            className="absolute -left-5 top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full bg-white text-wine shadow-lift transition hover:bg-wine hover:text-white lg:grid"
-            aria-label="Scroll reels left"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <div ref={sliderRef} className="swipe-row -mx-4 mt-8 gap-3 px-4 pb-2 sm:mx-0 sm:px-0">
-            {reels.map((reel, index) => (
-              <a
-                href={site.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="group relative w-[62vw] max-w-[245px] overflow-hidden bg-wine-deep sm:w-[230px]"
-                aria-label={`Watch ${reel.title} on Instagram`}
-                key={reel.title}
-              >
-                <div className="aspect-[9/14] overflow-hidden">
-                  <video
-                    src={reel.video}
-                    poster={reel.image}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    aria-label={`${reel.title} beauty video`}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/5 to-black/10" />
-                <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/35 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
-                  <Instagram size={12} /> Reel
-                </span>
-                <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                  <p className="text-[9px] font-bold tracking-[.18em] text-gold-soft">
-                    {reel.label}
-                  </p>
-                  <h3 className="mt-1 text-xl leading-tight">{reel.title}</h3>
-                  <p className="mt-2 flex items-center gap-1 text-[10px] font-bold tracking-wider opacity-75">
-                    WATCH NOW <ArrowRight size={12} />
-                  </p>
-                </div>
-                <span
-                  className="absolute left-0 top-0 h-1 bg-gold transition-all duration-500 group-hover:w-full"
-                  style={{ width: `${22 + index * 8}%` }}
-                />
-              </a>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => scrollReels(1)}
-            className="absolute -right-5 top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full bg-wine text-white shadow-lift transition hover:bg-wine-deep lg:grid"
-            aria-label="Scroll reels right"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
 function InstagramBlock() {
+  const { site } = useSiteSettings();
   const [posts, setPosts] = useState<{ id: number; image: string; caption?: string | null; link?: string | null }[]>([]);
 
   useEffect(() => {
@@ -904,7 +704,7 @@ function InstagramBlock() {
           >
             <img
               src={resolveImageUrl(post.image)}
-              alt={post.caption || "Lucky Varieties beauty inspiration"}
+              alt={post.caption || "LGS Cosmetics beauty inspiration"}
               loading="lazy"
               className="h-full w-full object-contain"
             />
@@ -917,35 +717,14 @@ function InstagramBlock() {
     </Section>
   );
 }
-const cat = (i: number) => categories[i]?.image ?? storeShelf;
-function Reviews() {
-  return (
-    <section className="bg-secondary py-16">
-      <div className="container-lv text-center">
-        <h2 className="text-4xl text-wine">Loved by Our Customers</h2>
-        <p className="mx-auto mt-8 max-w-2xl font-display text-2xl leading-relaxed">
-          “A placeholder for a genuine customer story about the in-store selection and helpful
-          shopping experience.”
-        </p>
-        <div className="mt-5 flex justify-center gap-1 text-gold">
-          {[1, 2, 3, 4, 5].map((x) => (
-            <Star key={x} size={16} className="fill-current" />
-          ))}
-        </div>
-        <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          Sample testimonial — replace with verified review
-        </p>
-      </div>
-    </section>
-  );
-}
 function StoreCta() {
+  const { site, whatsappUrl, mapsUrl, mapsEmbedUrl } = useSiteSettings();
   return (
     <section className="container-lv py-16">
       <div className="grid bg-wine text-white lg:grid-cols-2">
         <div className="p-7 sm:p-12">
           <p className="eyebrow !text-gold">COME SAY HELLO</p>
-          <h2 className="mt-4 text-4xl sm:text-5xl">Visit Lucky Varieties Beauty Mall</h2>
+          <h2 className="mt-4 text-4xl sm:text-5xl">Visit LGS</h2>
           <p className="mt-5 leading-7 text-white/75">
             {site.address.line1}
             <br />
@@ -973,7 +752,7 @@ function StoreCta() {
         </div>
         <div className="min-h-72 bg-secondary">
           <iframe
-            title="Lucky Varieties Beauty Mall location"
+            title="LGS Cosmetics location"
             src={mapsEmbedUrl}
             className="h-full min-h-72 w-full border-0"
             loading="lazy"
@@ -986,24 +765,18 @@ function StoreCta() {
   );
 }
 function Footer() {
+  const { site } = useSiteSettings();
+  const { data: storeCategories = [] } = useStoreCategories();
   const columns = [
     {
       title: "SHOP",
-      links: [
-        ["Makeup", "/shop/makeup"],
-        ["Skincare", "/shop/skincare"],
-        ["Nail Care", "/shop/nail-care"],
-        ["Hair Accessories", "/shop/hair-accessories"],
-        ["Jewellery", "/shop/jewellery"],
-        ["LGS Products", "/lgs-products"],
-      ],
+      links: storeCategories.map((category) => [category.name, `/shop/${category.slug}`]),
     },
     {
       title: "DISCOVER",
       links: [
         ["New Arrivals", "/new-arrivals"],
         ["Best Sellers", "/best-sellers"],
-        ["Offers", "/offers"],
         ["Gallery", "/gallery"],
         ["About Us", "/about"],
       ],
@@ -1012,7 +785,8 @@ function Footer() {
       title: "HELP",
       links: [
         ["Contact Us", "/contact"],
-        ["For Salons", "/for-salons"],
+        ["My Account & Orders", "/account"],
+
         ["FAQs", "/faqs"],
         ["Shipping Information", "/shipping-information"],
         ["Cancellation & Return Policy", "/return-policy"],
@@ -1025,30 +799,18 @@ function Footer() {
     <footer className="overflow-hidden bg-wine-deep text-white">
       <div className="container-lv grid min-w-0 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <a href="/" className="inline-flex" aria-label="Lucky Varieties Beauty Mall home">
-            <img src={lgsLogo} alt="Lucky Varieties Beauty Mall" className="h-14 w-auto" />
+          <a href="/" className="inline-flex" aria-label={`${site.name} home`}>
+            <img src={lgsLogo} alt={site.name} className="h-14 w-auto" />
           </a>
           <p className="mt-3 max-w-[330px] text-sm leading-6 text-white/60 sm:max-w-sm">
-            {site.tagline}. Beauty, personal care and professional salon solutions in Koregaon.
+            {site.tagline}. Beauty and personal care in Koregaon.
           </p>
-          <a
-            href={site.instagram}
-            className="mt-5 inline-flex items-center gap-2 text-xs text-gold"
-          >
-            <Instagram size={17} />
-            {site.instagramHandle}
-          </a>
-          <a
-            href={site.facebook}
-            target="_blank"
-            rel="noreferrer"
-            className="ml-4 inline-flex items-center gap-2 text-xs text-gold"
-          >
-            <Facebook size={17} />
-            Facebook
-          </a>
+          <div className="mt-5 flex flex-wrap items-center gap-3" aria-label="Social media">
+            <SocialIcons footer />
+          </div>
           <div className="mt-4 space-y-1 text-xs leading-5 text-white/60">
-            <a href={`tel:${site.phones[0]}`} className="block hover:text-white">
+            <a href={`tel:${site.phones[0]}`} className="flex w-fit items-center gap-2 whitespace-nowrap hover:text-white">
+              <Phone size={15} aria-hidden="true" className="shrink-0" />
               {site.phonesDisplay[0]}
             </a>
             <p>{site.address.line1}, {site.address.line2}</p>
@@ -1068,7 +830,7 @@ function Footer() {
         ))}
       </div>
       <div className="border-t border-white/10 py-5 text-center text-[10px] tracking-wide text-white/45">
-        © 2026 All Rights Reserved By Lucky Varieties Beauty Mall and Designed By{" "}
+        © 2026 All Rights Reserved By {site.name} and Designed By{" "}
         <a href="https://webakoof.com/" className="text-white/70 underline underline-offset-2 hover:text-white">
           Webakoof
         </a>
@@ -1077,85 +839,7 @@ function Footer() {
   );
 }
 
-export function AccountPage() {
-  const [mode, setMode] = useState<"login" | "register">("login");
-  return (
-    <>
-      <PageHero
-        title={mode === "login" ? "Welcome Back" : "Join Our Beauty World"}
-        copy="Save favourites, manage your bag and enjoy a smoother shopping experience."
-      />
-      <section className="container-lv py-12 sm:py-16">
-        <div className="mx-auto max-w-md bg-white p-6 shadow-card sm:p-9">
-          <div className="grid grid-cols-2 border-b">
-            {(["login", "register"] as const).map((item) => (
-              <button
-                key={item}
-                onClick={() => setMode(item)}
-                className={`h-12 border-b-2 text-xs font-bold uppercase tracking-widest ${mode === item ? "border-wine text-wine" : "border-transparent text-muted-foreground"}`}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              toast.success(
-                mode === "login" ? "Login demo submitted" : "Registration demo submitted",
-                {
-                  description: "Connect your authentication backend to activate customer accounts.",
-                },
-              );
-            }}
-            className="mt-7 space-y-4"
-          >
-            {mode === "register" && (
-              <CheckoutInput label="Full Name" placeholder="Your full name" />
-            )}
-            <CheckoutInput label="Email Address" placeholder="you@example.com" type="email" />
-            {mode === "register" && (
-              <CheckoutInput label="Phone Number" placeholder="10-digit mobile number" type="tel" />
-            )}
-            <CheckoutInput label="Password" placeholder="Enter your password" type="password" />
-            {mode === "login" && (
-              <div className="flex items-center justify-between text-xs">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="accent-wine" /> Remember me
-                </label>
-                <button
-                  type="button"
-                  onClick={() =>
-                    toast.message("Password reset", {
-                      description: "Connect email authentication to enable password reset.",
-                    })
-                  }
-                  className="text-wine underline"
-                >
-                  Forgot password?
-                </button>
-              </div>
-            )}
-            <button className="h-13 w-full bg-wine text-xs font-bold uppercase tracking-widest text-white">
-              {mode === "login" ? "Login" : "Create Account"}
-            </button>
-          </form>
-          <div className="mt-6 flex items-center gap-3 text-[10px] text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            SECURE CUSTOMER ACCESS
-            <span className="h-px flex-1 bg-border" />
-          </div>
-          <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
-            Shopping as a guest?{" "}
-            <a href="/shop" className="font-bold text-wine">
-              Continue shopping
-            </a>
-          </p>
-        </div>
-      </section>
-    </>
-  );
-}
+export function AccountPage() { return <CustomerAccountPage />; }
 
 export function WishlistPage() {
   const { wishlist, catalogProducts } = useShop();
@@ -1206,13 +890,13 @@ const infoPages: Record<
   { title: string; intro: string; sections: { heading: string; text: string }[] }
 > = {
   about: {
-    title: "About Lucky Varieties",
+    title: "About LGS Cosmetics",
     intro:
-      "Your local destination for beauty, personal care and professional salon solutions in Koregaon.",
+      "Your local destination for beauty and personal care in Koregaon.",
     sections: [
       {
         heading: "Beauty Under One Roof",
-        text: "Lucky Varieties Beauty Mall brings cosmetics, skincare, personal care, imitation jewellery, accessories and professional salon supplies together in one convenient store.",
+        text: "LGS Cosmetics brings cosmetics, skincare, personal care, imitation jewellery and accessories together in one convenient store.",
       },
       {
         heading: "Quality & Trust",
@@ -1220,7 +904,7 @@ const infoPages: Record<
       },
       {
         heading: "Discover LGS",
-        text: "LGS is our own growing beauty and skincare range, presented as part of the wider Lucky Varieties experience.",
+        text: "LGS Cosmetics brings skin and hair care essentials together for your everyday routine.",
       },
     ],
   },
@@ -1235,11 +919,7 @@ const infoPages: Record<
     sections: [
       {
         heading: "Can I order products online?",
-        text: "This frontend currently sends an order enquiry. Our store team confirms stock, delivery and payment details directly with you.",
-      },
-      {
-        heading: "Do you supply salons in bulk?",
-        text: "Yes. Visit the For Salons page or WhatsApp us with the product and approximate quantity you need.",
+        text: "Sign in and complete checkout to place your order. View order history, payment status and parcel updates in My Account & Orders.",
       },
       {
         heading: "Can I collect my order from the store?",
@@ -1249,15 +929,15 @@ const infoPages: Record<
   },
   "shipping-information": {
     title: "Shipping Information",
-    intro: "Clear delivery information for Lucky Varieties customers.",
+    intro: "Clear delivery information for LGS Cosmetics customers.",
     sections: [
       {
         heading: "Order Confirmation",
-        text: "Delivery availability, charges and estimated timing are confirmed by our store team after receiving your order enquiry.",
+        text: "Delivery charges appear at checkout. After dispatch, your account shows the courier, tracking number and available tracking link.",
       },
       {
         heading: "Delivery Area",
-        text: "Local and outstation delivery options can vary by product type, order value and destination. Professional equipment may require special handling.",
+        text: "Local and outstation delivery options can vary by product type, order value and destination.",
       },
     ],
   },
@@ -1281,7 +961,7 @@ const infoPages: Record<
     sections: [
       {
         heading: "Information You Provide",
-        text: "Checkout and enquiry forms may collect contact and delivery details so the store can respond to your request. Live storage and processing require backend integration.",
+        text: "Your account and checkout details are stored securely to process orders and provide order history, payment status and delivery updates.",
       },
       {
         heading: "Local Shopping Data",
@@ -1299,7 +979,7 @@ const infoPages: Record<
       },
       {
         heading: "Orders & Payments",
-        text: "Submitting checkout does not create a final paid order until availability, delivery and payment are confirmed by Lucky Varieties Beauty Mall.",
+        text: "Submitting checkout does not create a final paid order until availability, delivery and payment are confirmed by LGS Cosmetics.",
       },
     ],
   },
@@ -1375,6 +1055,7 @@ function parsePolicyDocument(raw: string): ParsedPolicy {
 }
 
 function PolicyPage({ page }: { page: InfoPageKey }) {
+  const { site } = useSiteSettings();
   const raw = policyDocuments[page];
   const title = policyTitles[page];
   if (!raw || !title) return null;
@@ -1413,6 +1094,7 @@ function PolicyPage({ page }: { page: InfoPageKey }) {
 }
 
 export function InfoPage({ page }: { page: InfoPageKey }) {
+  const { site } = useSiteSettings();
   if (policyDocuments[page]) return <PolicyPage page={page} />;
   const content = infoPages[page];
   if (page === "gallery")
@@ -1427,13 +1109,12 @@ export function InfoPage({ page }: { page: InfoPageKey }) {
               storeShelf,
               heroFestive,
               lgsCampaign,
-              heroSalon,
               promo,
               heroGlow,
             ].map((image, index) => (
               <img
                 src={image}
-                alt={`Lucky Varieties gallery ${index + 1}`}
+                alt={`LGS Cosmetics gallery ${index + 1}`}
                 className={`w-full object-cover ${index % 3 === 0 ? "row-span-2 h-full min-h-72" : "h-72"}`}
                 loading="lazy"
                 key={image}
@@ -1654,18 +1335,35 @@ export function CatalogPage({
   );
 }
 export function PageHero({ title, copy }: { title: string; copy: string }) {
+  const { site } = useSiteSettings();
+  const pathname = useLocation({ select: (location) => location.pathname });
+  const { data: content } = usePageContent(pathname);
+  const heading = content?.title || title;
   return (
-    <section className="overflow-hidden bg-wine-deep px-4 py-12 text-center text-white sm:py-20">
-      <p className="text-[10px] font-bold uppercase tracking-[.22em] text-gold">
-        Lucky Varieties Beauty Mall
+    <>
+    <section
+      className="overflow-hidden bg-[#f7ece5] bg-cover bg-center px-4 py-12 text-center text-wine sm:py-20"
+      style={{ backgroundImage: `url(${breadcrumbImage})` }}
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[.22em] text-wine">
+        {site.name}
       </p>
       <h1 className="mx-auto mt-3 max-w-[340px] text-4xl leading-tight sm:max-w-3xl sm:text-6xl">
-        {title}
+        {heading}
       </h1>
-      <p className="mx-auto mt-3 max-w-[320px] text-sm leading-6 text-white/65 sm:max-w-xl">
-        {copy}
+      <nav aria-label="Breadcrumb" className="mt-4 text-xs font-medium">
+        <ol className="flex flex-wrap items-center justify-center gap-2">
+          <li><a href="/" className="underline-offset-4 hover:underline">Home</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page">{heading}</li>
+        </ol>
+      </nav>
+      <p className="mx-auto mt-3 max-w-[320px] text-sm leading-6 text-wine/80 sm:max-w-xl">
+        {content ? content.intro : copy}
       </p>
     </section>
+    {content?.body && <section className="container-lv py-10"><div className="mx-auto max-w-3xl whitespace-pre-line text-sm leading-7 text-muted-foreground">{content.body}</div></section>}
+    </>
   );
 }
 export function ProductPage({ product }: { product: Product }) {
@@ -1684,6 +1382,8 @@ export function ProductPage({ product }: { product: Product }) {
     ...(product.keyIngredients ? [`Key Ingredients: ${product.keyIngredients.join(", ")}`] : []),
   ];
   return (
+    <>
+      <PageHero title={product.name} copy={product.subtitle} />
     <div className="container-lv py-8">
       <div className="grid gap-8 md:grid-cols-2 md:gap-6 lg:gap-8">
         <div className="grid grid-cols-[58px_1fr] gap-2 min-[390px]:grid-cols-[68px_1fr] min-[390px]:gap-3 md:grid-cols-[52px_1fr] lg:grid-cols-[72px_1fr]">
@@ -1717,9 +1417,9 @@ export function ProductPage({ product }: { product: Product }) {
         </div>
         <div className="md:px-2 lg:px-8">
           <p className="eyebrow">{product.brand}</p>
-          <h1 className="mt-3 text-3xl leading-tight text-wine min-[390px]:text-4xl md:text-3xl lg:text-5xl">
+          <h2 className="mt-3 text-3xl leading-tight text-wine min-[390px]:text-4xl md:text-3xl lg:text-5xl">
             {product.name}
-          </h1>
+          </h2>
           <div className="mt-3 flex items-center gap-2 text-sm">
             <Star size={15} className="fill-gold text-gold" />
             {product.rating} ({product.reviews} reviews)
@@ -1871,264 +1571,8 @@ export function ProductPage({ product }: { product: Product }) {
         />
       </div>
     </div>
-  );
-}
-
-export function CheckoutPage() {
-  const { lines, subtotal, setQty, removeFromCart } = useShop();
-  const delivery = subtotal >= 999 || subtotal === 0 ? 0 : 79;
-  const [couponCode, setCouponCode] = useState("");
-  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
-  const [couponMessage, setCouponMessage] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
-  const discount = coupon?.discount ?? 0;
-  const total = Math.max(subtotal + delivery - discount, 0);
-  const [payment, setPayment] = useState("cod");
-
-  async function applyCoupon() {
-    if (!couponCode.trim()) return;
-    setCouponLoading(true); setCouponMessage("");
-    try {
-      const response = await fetch(`${ADMIN_API_BASE}/api/coupons/validate/${encodeURIComponent(couponCode.trim())}?subtotal=${subtotal}`);
-      const data = await response.json();
-      if (!response.ok) { setCoupon(null); setCouponMessage(data?.message || "Invalid coupon code."); }
-      else { setCoupon(data.data); setCouponMessage("Coupon applied successfully."); }
-    } catch { setCouponMessage("Unable to validate coupon right now."); }
-    finally { setCouponLoading(false); }
-  }
-
-  if (lines.length === 0) {
-    return (
-      <>
-        <PageHero title="Your Bag Is Empty" copy="Add a beauty favourite before checking out." />
-        <section className="container-lv grid min-h-80 place-items-center py-16 text-center">
-          <div>
-            <ShoppingBag className="mx-auto size-10 text-wine" />
-            <h2 className="mx-auto mt-4 max-w-[320px] text-2xl text-wine min-[390px]:text-3xl">
-              Ready for a little beauty shopping?
-            </h2>
-            <a
-              href="/shop"
-              className="mt-7 inline-flex h-12 items-center gap-3 bg-wine px-7 text-xs font-bold tracking-widest text-white"
-            >
-              EXPLORE PRODUCTS <ArrowRight size={15} />
-            </a>
-          </div>
-        </section>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <PageHero title="Secure Checkout" copy="Complete your order enquiry in just a few steps." />
-      <section className="container-lv grid gap-8 py-10 lg:grid-cols-[1fr_420px] lg:py-14">
-        <form
-          id="checkout-form"
-          onSubmit={(event) => {
-            event.preventDefault();
-            toast.success("Order details received", {
-              description: "Our store team will contact you to confirm availability and delivery.",
-            });
-          }}
-          className="space-y-8"
-        >
-          <div className="bg-white p-5 sm:p-8">
-            <div className="flex items-center gap-3">
-              <span className="grid size-7 place-items-center rounded-full bg-wine text-xs font-bold text-white">
-                1
-              </span>
-              <h2 className="text-2xl text-wine">Contact Information</h2>
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <CheckoutInput label="Full Name" placeholder="Your full name" />
-              <CheckoutInput label="Phone Number" placeholder="10-digit mobile number" type="tel" />
-              <CheckoutInput
-                label="Email Address"
-                placeholder="you@example.com"
-                type="email"
-                optional
-              />
-              <CheckoutInput
-                label="WhatsApp Number"
-                placeholder="For order updates"
-                type="tel"
-                optional
-              />
-            </div>
-          </div>
-
-          <div className="bg-white p-5 sm:p-8">
-            <div className="flex items-center gap-3">
-              <span className="grid size-7 place-items-center rounded-full bg-wine text-xs font-bold text-white">
-                2
-              </span>
-              <h2 className="text-2xl text-wine">Delivery Address</h2>
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <CheckoutInput label="Address" placeholder="House, building and street" />
-              </div>
-              <CheckoutInput label="City / Town" placeholder="City" />
-              <CheckoutInput label="PIN Code" placeholder="6-digit PIN code" />
-              <CheckoutInput label="District" placeholder="District" />
-              <CheckoutInput label="State" placeholder="Maharashtra" />
-            </div>
-            <label className="mt-5 flex min-h-11 items-center gap-3 text-sm">
-              <input type="checkbox" className="size-4 accent-wine" /> Pick up from our Koregaon
-              store instead
-            </label>
-          </div>
-
-          <div className="bg-white p-5 sm:p-8">
-            <div className="flex items-center gap-3">
-              <span className="grid size-7 place-items-center rounded-full bg-wine text-xs font-bold text-white">
-                3
-              </span>
-              <h2 className="text-2xl text-wine">Payment Preference</h2>
-            </div>
-            <div className="mt-6 space-y-3">
-              {(
-                [
-                  ["cod", "Cash on Delivery", "Pay when your confirmed order arrives"],
-                  [
-                    "upi",
-                    "UPI / Online Payment",
-                    "Payment details shared after stock confirmation",
-                  ],
-                  ["store", "Pay at Store", "Reserve now and pay during pickup"],
-                ] as const
-              ).map(([value, title, copy]) => (
-                <label
-                  key={value}
-                  className={`flex min-h-16 cursor-pointer items-center gap-4 border p-4 ${payment === value ? "border-wine bg-secondary" : "bg-white"}`}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value={value}
-                    checked={payment === value}
-                    onChange={() => setPayment(value)}
-                    className="size-4 accent-wine"
-                  />
-                  <span>
-                    <b className="block text-sm">{title}</b>
-                    <span className="text-xs text-muted-foreground">{copy}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </form>
-
-        <aside className="h-fit bg-white p-5 sm:p-7 lg:sticky lg:top-32">
-          <h2 className="text-3xl text-wine">Order Summary</h2>
-          <div className="mt-5 max-h-[390px] space-y-4 overflow-y-auto pr-1">
-            {lines.map(({ line, product }) => (
-              <div
-                className="flex gap-3 border-b pb-4"
-                key={`${product.id}-${line.shade ?? "default"}`}
-              >
-                <div className="relative shrink-0">
-                  <img src={product.image} alt={product.name} className="size-20 object-cover" />
-                  <span className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-wine text-[10px] text-white">
-                    {line.qty}
-                  </span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="line-clamp-1 font-display text-lg">{product.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{line.shade ?? product.type}</p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="flex items-center border">
-                      <button
-                        type="button"
-                        onClick={() => setQty(product.id, line.qty - 1, line.shade, line.variant)}
-                        className="grid size-7 place-items-center"
-                      >
-                        <Minus size={12} />
-                      </button>
-                      <span className="w-6 text-center text-[11px]">{line.qty}</span>
-                      <button
-                        type="button"
-                        onClick={() => setQty(product.id, line.qty + 1, line.shade, line.variant)}
-                        className="grid size-7 place-items-center"
-                      >
-                        <Plus size={12} />
-                      </button>
-                    </div>
-                    <b className="text-xs">{formatINR(product.price * line.qty)}</b>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeFromCart(product.id, line.shade, line.variant)}
-                    className="mt-2 text-[10px] underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-5 border-t pt-5">
-            <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Coupon code</label>
-            <div className="mt-2 flex gap-2">
-              <input value={couponCode} onChange={(event) => setCouponCode(event.target.value.toUpperCase())} placeholder="Enter coupon code" className="h-11 min-w-0 flex-1 border px-3 text-sm outline-none focus:border-wine" />
-              <button type="button" onClick={applyCoupon} disabled={couponLoading} className="h-11 bg-wine px-4 text-xs font-bold text-white disabled:opacity-60">{couponLoading ? "..." : "APPLY"}</button>
-            </div>
-            {couponMessage && <p className={`mt-2 text-xs ${coupon ? "text-emerald-700" : "text-red-600"}`}>{couponMessage}</p>}
-          </div>
-          <div className="mt-5 space-y-3 border-t pt-5 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span>{formatINR(subtotal)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Delivery</span>
-              <span>{delivery ? formatINR(delivery) : "FREE"}</span>
-            </div>
-            {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Coupon discount</span><span>-{formatINR(discount)}</span></div>}
-            <div className="flex justify-between border-t pt-4 text-lg">
-              <b>Total</b>
-              <b>{formatINR(total)}</b>
-            </div>
-          </div>
-          <button
-            form="checkout-form"
-            type="submit"
-            className="mt-6 h-13 w-full bg-wine text-xs font-bold tracking-widest text-white"
-          >
-            PLACE ORDER ENQUIRY
-          </button>
-          <p className="mt-4 flex items-center justify-center gap-2 text-center text-[10px] leading-4 text-muted-foreground">
-            <ShieldCheck size={14} /> Product availability and payment are confirmed by the store.
-          </p>
-        </aside>
-      </section>
     </>
   );
 }
 
-function CheckoutInput({
-  label,
-  placeholder,
-  type = "text",
-  optional = false,
-}: {
-  label: string;
-  placeholder: string;
-  type?: string;
-  optional?: boolean;
-}) {
-  return (
-    <label className="block text-xs font-semibold">
-      {label}
-      {optional && <span className="font-normal text-muted-foreground"> (optional)</span>}
-      <input
-        required={!optional}
-        type={type}
-        placeholder={placeholder}
-        className="mt-2 h-12 w-full border bg-ivory px-4 text-sm font-normal outline-none transition focus:border-wine"
-      />
-    </label>
-  );
-}
+export function CheckoutPage() { return <CustomerCheckout />; }

@@ -37,6 +37,7 @@ function Page() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reload, setReload] = useState(0);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const totalStock = useMemo(
@@ -51,12 +52,20 @@ function Page() {
       try {
         setLoading(true);
         setError("");
-        const response = await fetch(`${ADMIN_API_BASE}/api/products?limit=100`);
-        const data = await response.json();
+        const allProducts: Product[] = [];
+        for (let page = 1; ; page += 1) {
+          const response = await fetch(`${ADMIN_API_BASE}/api/products?limit=100&page=${page}`);
+          const data = await response.json();
+          if (!response.ok || !data.success || !Array.isArray(data.data)) {
+            throw new Error("Unable to load products. Check that the backend and database are running.");
+          }
+          allProducts.push(...data.data);
+          if (page >= (data.pagination?.totalPages ?? 1)) break;
+        }
         if (!active) return;
-        setProducts(Array.isArray(data?.data) ? data.data : []);
+        setProducts(allProducts);
       } catch {
-        if (active) setError("Unable to load products right now.");
+        if (active) setError("Unable to load products. Check that the backend and database are running.");
       } finally {
         if (active) setLoading(false);
       }
@@ -66,7 +75,7 @@ function Page() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [reload]);
 
   async function handleDelete(productId: number) {
     if (!token) return;
@@ -99,6 +108,7 @@ function Page() {
         action={
           <Link
             to="/admin/products/add"
+            search={{ id: undefined }}
             className="rounded-xl bg-[#7f1d1d] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#651717]"
           >
             + Add Product
@@ -116,6 +126,15 @@ function Page() {
         {loading ? (
           <div className="grid min-h-64 place-items-center text-center">
             <p className="text-sm text-stone-500">Loading products…</p>
+          </div>
+        ) : error && products.length === 0 ? (
+          <div className="grid min-h-64 place-items-center text-center">
+            <div>
+              <h3 className="text-xl font-semibold">Products could not be loaded</h3>
+              <button type="button" onClick={() => setReload((value) => value + 1)} className="mt-4 rounded-xl bg-[#7f1d1d] px-5 py-3 text-sm font-semibold text-white">
+                Retry
+              </button>
+            </div>
           </div>
         ) : products.length === 0 ? (
           <div className="grid min-h-64 place-items-center text-center">

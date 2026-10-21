@@ -9,6 +9,10 @@ import { OrderItem } from "./OrderItem.js";
 import { ContactEnquiry } from "./ContactEnquiry.js";
 import { Coupon } from "./Coupon.js";
 import { InstagramPost } from "./InstagramPost.js";
+import { SiteSetting } from "./SiteSetting.js";
+import { Review } from "./Review.js";
+import { OrderEvent } from "./OrderEvent.js";
+import { OrderEmail } from "./OrderEmail.js";
 
 export function syncModels() {
   ProductCategory.hasMany(Product, { foreignKey: "categoryId", as: "products" });
@@ -23,6 +27,9 @@ export function syncModels() {
   Order.hasMany(OrderItem, { foreignKey: "orderId", as: "items", onDelete: "CASCADE" });
   OrderItem.belongsTo(Order, { foreignKey: "orderId", as: "order" });
   OrderItem.belongsTo(Product, { foreignKey: "productId", as: "product" });
+  Order.hasMany(OrderEvent, { foreignKey: "orderId", as: "events", onDelete: "CASCADE" });
+  OrderEvent.belongsTo(Order, { foreignKey: "orderId", as: "order" });
+  Order.hasMany(OrderEmail, { foreignKey: "orderId", as: "emails", onDelete: "CASCADE" });
 
   return {
     Admin,
@@ -36,6 +43,10 @@ export function syncModels() {
     ContactEnquiry,
     Coupon,
     InstagramPost,
+    SiteSetting,
+    Review,
+    OrderEvent,
+    OrderEmail,
   };
 }
 
@@ -51,4 +62,8 @@ export {
   ContactEnquiry,
   Coupon,
   InstagramPost,
+  SiteSetting,
+  Review,
+  OrderEvent,
+  OrderEmail,
 };

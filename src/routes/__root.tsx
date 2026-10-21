@@ -9,6 +9,9 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { GeneralSettingsProvider, type GeneralSettings } from "@/lib/general-settings";
+import { readSiteSetting, seoDefaults } from "@/lib/site-settings";
+
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -73,25 +76,36 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: async () => {
+    try {
+      const [seo, settings] = await Promise.all([
+        readSiteSetting<typeof seoDefaults>("seo", AbortSignal.timeout(2000)).catch(() => null),
+        readSiteSetting<GeneralSettings>("general", AbortSignal.timeout(2000)).catch(() => null),
+      ]);
+      return { seo: { ...seoDefaults, ...seo }, settings };
+    } catch { return { seo: seoDefaults, settings: null }; }
+  },
+  head: ({ loaderData }) => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lucky Varieties Beauty Mall | Cosmetics Shop in Koregaon" },
+      { title: loaderData?.seo.title ?? seoDefaults.title },
       {
         name: "description",
         content:
-          "Shop beauty, cosmetics, LGS skincare, jewellery and professional salon supplies at Lucky Varieties Beauty Mall, Koregaon, Satara.",
+          loaderData?.seo.description ?? seoDefaults.description,
       },
-      { name: "author", content: "Lucky Varieties Beauty Mall" },
-      { property: "og:title", content: "Lucky Varieties Beauty Mall" },
+      { name: "author", content: "LGS Cosmetics" },
+      { name: "keywords", content: loaderData?.seo.keywords ?? seoDefaults.keywords },
+      { property: "og:title", content: loaderData?.seo.socialTitle || loaderData?.seo.title || seoDefaults.socialTitle },
       {
         property: "og:description",
-        content: "Premium beauty products for everyday glow in Koregaon, Satara.",
+        content: loaderData?.seo.socialDescription || loaderData?.seo.description || seoDefaults.socialDescription,
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Lucky Varieties Beauty Mall" },
+      { name: "twitter:title", content: loaderData?.seo.socialTitle || loaderData?.seo.title || seoDefaults.socialTitle },
+      { name: "twitter:description", content: loaderData?.seo.socialDescription || loaderData?.seo.description || seoDefaults.socialDescription },
     ],
     links: [
       {
@@ -123,11 +137,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { settings } = Route.useLoaderData();
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <GeneralSettingsProvider initialSettings={settings}><Outlet /></GeneralSettingsProvider>
     </QueryClientProvider>
   );
 }

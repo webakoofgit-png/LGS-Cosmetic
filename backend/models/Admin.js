@@ -10,6 +10,7 @@ export const Admin = sequelize.define(
     role: { type: DataTypes.STRING(50), allowNull: false, defaultValue: "Super Admin" },
     status: { type: DataTypes.STRING(20), allowNull: false, defaultValue: "Active" },
     lastLoginAt: { type: DataTypes.DATE, allowNull: true },
+    tokenVersion: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0, field: "token_version" },
   },
   { tableName: "admins" },
 );

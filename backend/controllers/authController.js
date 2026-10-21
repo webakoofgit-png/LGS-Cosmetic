@@ -2,9 +2,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { Admin } from "../models/index.js";
 
-function signToken(admin) {
+export function signToken(admin) {
   return jwt.sign(
-    { id: admin.id, email: admin.email, role: admin.role, name: admin.name },
+    { id: admin.id, email: admin.email, role: admin.role, name: admin.name, version: admin.tokenVersion },
     process.env.JWT_SECRET || "change_this_to_a_strong_secret",
     { expiresIn: "7d" },
   );
@@ -17,8 +17,8 @@ export async function login(req, res, next) {
       return res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
-    const admin = await Admin.findOne({ where: { email } });
-    if (!admin) {
+    const admin = await Admin.findOne({ where: { email: String(email).trim().toLowerCase() } });
+    if (!admin || admin.status !== "Active") {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 

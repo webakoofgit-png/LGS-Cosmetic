@@ -5,7 +5,6 @@ import catHair from "@/assets/cat-hair.jpg";
 import catPersonal from "@/assets/cat-personal.jpg";
 import catJewellery from "@/assets/cat-jewellery.jpg";
 import catLgs from "@/assets/cat-lgs.jpg";
-import catSalon from "@/assets/cat-salon.jpg";
 import storeShelf from "@/assets/store-shelf.jpg";
 import lgsCampaign from "@/assets/lgs-campaign.jpg";
 import heroFestive from "@/assets/hero_festive.png";
@@ -18,35 +17,11 @@ export type Category = {
   name: string;
   tagline: string;
   image: string;
-  group: "MAKEUP" | "SKINCARE" | "BEAUTY" | "PROFESSIONAL";
+  group: "MAKEUP" | "SKINCARE" | "BEAUTY";
   types: string[];
 };
 
 export const categories: Category[] = [
-  {
-    slug: "makeup",
-    name: "Makeup",
-    tagline: "Face, eyes, lips & tools",
-    image: catMakeup,
-    group: "MAKEUP",
-    types: ["Face", "Eyes", "Lips", "Makeup Tools"],
-  },
-  {
-    slug: "skincare",
-    name: "Skincare",
-    tagline: "Daily care that shows",
-    image: catSkincare,
-    group: "SKINCARE",
-    types: ["Moisturizers", "Face Care", "Self Care", "LGS Skincare"],
-  },
-  {
-    slug: "nail-care",
-    name: "Nail Care",
-    tagline: "Colour, care & tools",
-    image: catNail,
-    group: "BEAUTY",
-    types: ["Nail Polish", "Nail Tools", "Nail Care"],
-  },
   {
     slug: "hair-accessories",
     name: "Hair & Accessories",
@@ -64,28 +39,12 @@ export const categories: Category[] = [
     types: ["Body Care", "Bath", "Daily Essentials"],
   },
   {
-    slug: "jewellery",
-    name: "Imitation Jewellery",
-    tagline: "Festive & everyday pieces",
-    image: catJewellery,
-    group: "BEAUTY",
-    types: ["Earrings", "Bangles", "Necklace Sets"],
-  },
-  {
     slug: "lgs-products",
     name: "LGS Products",
     tagline: "Our own beauty range",
     image: catLgs,
     group: "SKINCARE",
     types: ["LGS Skincare", "LGS Body Care"],
-  },
-  {
-    slug: "salon-essentials",
-    name: "Salon Essentials",
-    tagline: "Professional & wholesale",
-    image: catSalon,
-    group: "PROFESSIONAL",
-    types: ["Salon Equipment", "Salon Chairs", "Hydra Facial Machines", "Wholesale Supplies"],
   },
   {
     slug: "hair-care",
@@ -102,30 +61,6 @@ export const categories: Category[] = [
     image: catSkincare,
     group: "SKINCARE",
     types: ["Skin Care"],
-  },
-  {
-    slug: "treatment-care",
-    name: "Treatment Care",
-    tagline: "Targeted skin routines",
-    image: catSkincare,
-    group: "SKINCARE",
-    types: ["Treatment Care"],
-  },
-  {
-    slug: "sun-care",
-    name: "Sun Care",
-    tagline: "Everyday sun protection",
-    image: catSkincare,
-    group: "SKINCARE",
-    types: ["Sun Care"],
-  },
-  {
-    slug: "face-care",
-    name: "Face Care",
-    tagline: "Gentle cleansing care",
-    image: catSkincare,
-    group: "SKINCARE",
-    types: ["Face Care"],
   },
 ];
 
@@ -161,9 +96,9 @@ export type Product = {
 
 type Seed = Omit<
   Product,
-  "id" | "slug" | "description" | "howToUse" | "benefits" | "details" | "inStock"
+  "id" | "slug" | "description" | "howToUse" | "benefits" | "details" | "inStock" | "rating" | "reviews"
 > &
-  Partial<Pick<Product, "inStock" | "description" | "howToUse" | "benefits" | "details">>;
+  Partial<Pick<Product, "inStock" | "description" | "howToUse" | "benefits" | "details" | "rating" | "reviews">>;
 
 const slugify = (s: string) =>
   s
@@ -245,7 +180,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Velvet Matte Lipstick",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "makeup",
     type: "Lips",
     subtitle: "Long Wear Lipstick",
@@ -260,7 +195,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Silk Finish Compact Powder",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "makeup",
     type: "Face",
     subtitle: "Oil Control Compact · 10 g",
@@ -274,7 +209,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Festive Eyeshadow Palette",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "makeup",
     type: "Eyes",
     subtitle: "12 Shade Palette",
@@ -288,7 +223,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Everyday Kajal Stick",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "makeup",
     type: "Eyes",
     subtitle: "Smudge Resistant Kajal",
@@ -302,7 +237,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Blending Brush Set",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "makeup",
     type: "Makeup Tools",
     subtitle: "Set of 6 Brushes",
@@ -316,7 +251,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Hydrating Day Cream",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "skincare",
     type: "Moisturizers",
     subtitle: "Light Day Cream · 50 g",
@@ -330,7 +265,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Aloe Soothing Gel",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "skincare",
     type: "Self Care",
     subtitle: "Multi Use Gel · 150 ml",
@@ -344,7 +279,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Vitamin C Face Wash",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "skincare",
     type: "Face Care",
     subtitle: "Brightening Cleanser · 100 ml",
@@ -358,7 +293,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Glossy Nail Polish",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "nail-care",
     type: "Nail Polish",
     subtitle: "High Shine · 9 ml",
@@ -373,7 +308,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Matte Nail Polish Set",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "nail-care",
     type: "Nail Polish",
     subtitle: "Set of 4 Shades",
@@ -388,7 +323,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Manicure Tool Kit",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "nail-care",
     type: "Nail Tools",
     subtitle: "7 Piece Steel Kit",
@@ -402,7 +337,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Satin Scrunchie Pack",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "hair-accessories",
     type: "Hair Accessories",
     subtitle: "Pack of 6",
@@ -416,7 +351,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Detangling Hair Brush",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "hair-accessories",
     type: "Combs & Brushes",
     subtitle: "Cushion Paddle Brush",
@@ -430,7 +365,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Hair Serum & Care Oil",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "hair-accessories",
     type: "Hair Care",
     subtitle: "Frizz Control · 100 ml",
@@ -444,7 +379,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Body Lotion Deep Care",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "personal-care",
     type: "Body Care",
     subtitle: "24H Moisture · 400 ml",
@@ -458,7 +393,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Handmade Soap Trio",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "personal-care",
     type: "Bath",
     subtitle: "Set of 3 Bars",
@@ -472,7 +407,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Kundan Earring Set",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "jewellery",
     type: "Earrings",
     subtitle: "Gold Tone Imitation",
@@ -486,7 +421,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Festive Bangle Set",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "jewellery",
     type: "Bangles",
     subtitle: "Set of 12 Bangles",
@@ -500,7 +435,7 @@ const seeds: Seed[] = [
   },
   {
     name: "Pearl Necklace Set",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "jewellery",
     type: "Necklace Sets",
     subtitle: "Necklace + Earrings",
@@ -513,64 +448,8 @@ const seeds: Seed[] = [
     tags: ["offer"],
   },
   {
-    name: "Professional Salon Chair",
-    brand: "Salon Pro",
-    category: "salon-essentials",
-    type: "Salon Chairs",
-    subtitle: "Hydraulic Styling Chair",
-    price: 12500,
-    mrp: 15900,
-    rating: 4.6,
-    reviews: 8,
-    image: catSalon,
-    hoverImage: catSalon,
-    tags: ["bestseller"],
-  },
-  {
-    name: "Hydra Facial Machine",
-    brand: "Salon Pro",
-    category: "salon-essentials",
-    type: "Hydra Facial Machines",
-    subtitle: "Multi Function Facial System",
-    price: 48900,
-    mrp: 59900,
-    rating: 4.8,
-    reviews: 5,
-    image: catSalon,
-    hoverImage: catSalon,
-    tags: ["new", "trending"],
-  },
-  {
-    name: "Facial Steamer Trolley",
-    brand: "Salon Pro",
-    category: "salon-essentials",
-    type: "Salon Equipment",
-    subtitle: "Ozone Steamer with Stand",
-    price: 6900,
-    mrp: 8900,
-    rating: 4.4,
-    reviews: 6,
-    image: catSalon,
-    hoverImage: catSalon,
-    tags: ["offer"],
-  },
-  {
-    name: "Salon Bulk Waxing Kit",
-    brand: "Salon Pro",
-    category: "salon-essentials",
-    type: "Wholesale Supplies",
-    subtitle: "Professional Bulk Pack",
-    price: 2499,
-    mrp: 3299,
-    rating: 4.3,
-    reviews: 9,
-    image: catSalon,
-    hoverImage: catPersonal,
-    tags: ["bestseller"],
-  },
-  {
     name: "Glow Gift Hamper",
-    brand: "Lucky Varieties",
+    brand: "LGS Cosmetics",
     category: "makeup",
     type: "Face",
     subtitle: "Festive Beauty Hamper",
@@ -587,7 +466,7 @@ const seeds: Seed[] = [
 const brochureSeeds: Seed[] = [
   { name: "LGS Moisturizer", brand: "LGS", category: "lgs-products", type: "Moisturizers", subtitle: "Daily Moisturizer", price: 299, mrp: 299, image: lgsSkincareCatalog, hoverImage: lgsSkincareCatalog, size: "100 gm", variants: [{ label: "100 gm", size: "100 gm", price: 299 }, { label: "200 gm", size: "200 gm", price: 499 }], tags: ["new"], description: "LGS daily moisturizer for soft, hydrated-looking skin.", howToUse: "Apply gently to clean skin.", benefits: ["Helps moisturize skin."], inStock: true },
   { name: "LGS Anti Blemishing Face Bar", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Anti blemishing face bar", price: 59, mrp: 59, image: lgsSkincareCatalog, hoverImage: lgsSkincareCatalog, size: "25 gm", tags: ["new"], description: "LGS anti blemishing cleansing bar.", howToUse: "Lather with water and rinse.", benefits: ["Gentle daily cleansing."], inStock: true },
-  { name: "LGS D-TAN Face Pack", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "D-TAN face pack", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "100 gm", variants: [{ label: "100 gm", size: "100 gm", price: 369 }, { label: "250 gm", size: "250 gm", price: 699 }], tags: ["new"], description: "LGS D-TAN face pack for salon care.", howToUse: "Apply as directed and rinse.", benefits: ["Helps refresh the look of skin."], inStock: true },
+  { name: "LGS D-TAN Face Pack", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "D-TAN face pack", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "100 gm", variants: [{ label: "100 gm", size: "100 gm", price: 369 }, { label: "250 gm", size: "250 gm", price: 699 }], tags: ["new"], description: "LGS D-TAN face pack for skin care.", howToUse: "Apply as directed and rinse.", benefits: ["Helps refresh the look of skin."], inStock: true },
   { name: "LGS Anti Blemish Cream", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Treatment care cream", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "50 gm", tags: ["new"], description: "LGS anti blemish cream with neem and aloe vera.", howToUse: "Apply gently to clean skin.", benefits: ["Helps support clear-looking skin."], inStock: true },
   { name: "LGS Under Eye Gel", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Reduces dark circles", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "50 gm", tags: ["new"], description: "LGS under eye gel with carrot oil and aloe vera.", howToUse: "Apply carefully around the eye area.", benefits: ["Hydrates the under-eye area."], inStock: true },
   { name: "LGS Acne Pimple Oil Control Cream", brand: "LGS", category: "lgs-products", type: "Face Care", subtitle: "Treatment care cream", price: 369, mrp: 369, image: lgsTreatmentCatalog, hoverImage: lgsTreatmentCatalog, size: "50 gm", tags: ["new"], description: "LGS acne pimple oil control cream with tea tree oil and aloe vera.", howToUse: "Apply gently to clean skin.", benefits: ["Helps control excess oil appearance."], inStock: true },
@@ -996,13 +875,15 @@ const normalizeProduct = (s: Seed, i: number): Product => {
   return {
     ...s,
     name: displayName,
+    rating: s.rating ?? 0,
+    reviews: s.reviews ?? 0,
     id: `lv-${String(i + 1).padStart(3, "0")}`,
     slug: slugify(displayName),
     inStock: s.inStock ?? true,
     stock: s.stock ?? (s.inStock === false ? 0 : 24),
     description:
       s.description ??
-      `${s.name} from ${s.brand}, available at Lucky Varieties Beauty Mall, Koregaon. Part of our ${cat?.name ?? "beauty"} range, selected for everyday use and dependable quality.`,
+      `${s.name} from ${s.brand}, available at LGS Cosmetics, Koregaon. Part of our ${cat?.name ?? "beauty"} range, selected for everyday use and dependable quality.`,
     howToUse:
       s.howToUse ??
       "Apply as needed on clean skin or the intended area. For external use only. Discontinue use if irritation occurs and consult a professional.",
@@ -1037,10 +918,20 @@ export function searchProducts(query: string) {
 }
 
 export const beautyNeeds = [
-  { title: "Everyday Glow", image: catSkincare, to: "/shop/skincare" },
-  { title: "Party Ready", image: catMakeup, to: "/shop/makeup" },
-  { title: "Skincare Essentials", image: catLgs, to: "/lgs-products" },
-  { title: "Perfect Nails", image: catNail, to: "/shop/nail-care" },
-  { title: "Hair Essentials", image: catHair, to: "/shop/hair-accessories" },
-  { title: "Festive Beauty", image: heroFestive, to: "/shop/jewellery" },
+  { slug: "skin-care", title: "Skin Care", description: "Everyday cleansing, moisture and care.", to: "/shop?need=skin-care" },
+  { slug: "sun-dtan-care", title: "Sun & D-Tan Care", description: "Sunscreen and face packs for your routine.", to: "/shop?need=sun-dtan-care" },
+  { slug: "hair-care", title: "Hair Care", description: "Oils, tonics and serums for your hair.", to: "/shop?need=hair-care" },
+  { slug: "shampoo-scalp-care", title: "Shampoo & Scalp Care", description: "A fresh start to your hair wash routine.", to: "/shop?need=shampoo-scalp-care" },
 ];
+
+export function matchesBeautyNeed(product: Product, need: string) {
+  const name = product.name.toLowerCase();
+  const sunCare = /sunscreen|sun\s*block|\bspf\b|d[\s-]*tan/.test(name);
+  const shampoo = /shampoo/.test(name);
+  const hairCare = /hair/.test(`${product.category} ${product.type} ${name}`);
+  if (need === "sun-dtan-care") return sunCare;
+  if (need === "shampoo-scalp-care") return shampoo;
+  if (need === "hair-care") return hairCare && !shampoo;
+  if (need === "skin-care") return !sunCare && !shampoo && !hairCare && /face|skin|moistur|cream|eye|blemish/.test(`${product.category} ${product.type} ${name}`.toLowerCase());
+  return false;
+}

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { clearAdminSession, getAdminProfile, getAdminToken } from "@/lib/admin-session";
+import { useSiteSettings } from "@/lib/general-settings";
 import lgsLogo from "@/assets/lgs_logo.png";
 
 const nav = [
@@ -42,6 +43,7 @@ const nav = [
 ] as const;
 
 export function AdminShell({ children }: { children: ReactNode }) {
+  const { site } = useSiteSettings();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -51,6 +53,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
     setProfile(getAdminProfile());
     if (typeof window !== "undefined" && !getAdminToken()) router.navigate({ to: "/admin/login" });
   }, [router]);
+
+  useEffect(() => {
+    const refresh = () => setProfile(getAdminProfile());
+    window.addEventListener("admin-session-updated", refresh);
+    return () => window.removeEventListener("admin-session-updated", refresh);
+  }, []);
 
   if (!profile) {
     return (
@@ -72,10 +80,10 @@ export function AdminShell({ children }: { children: ReactNode }) {
         ].join(" ")}
       >
         <div className="flex h-20 items-center gap-3 border-b border-[#f0e7dd] px-5">
-          <img src={lgsLogo} alt="LGS Cosmetics" className="h-11 w-auto" />
+          <img src={lgsLogo} alt={site.name} className="h-11 w-auto" />
           {!collapsed && (
             <div>
-              <p className="text-xs font-bold tracking-[0.22em] text-[#7f1d1d]">LGS COSMETICS</p>
+              <p className="text-xs font-bold tracking-[0.22em] text-[#7f1d1d]">{site.name}</p>
               <p className="text-[11px] text-stone-500">Admin panel</p>
             </div>
           )}
@@ -149,7 +157,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           </button>
           <div className="flex-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-stone-400">Admin workspace</p>
-            <h1 className="text-base font-semibold text-[#7f1d1d]">Lucky Varieties Beauty Mall</h1>
+            <h1 className="text-base font-semibold text-[#7f1d1d]">{site.name}</h1>
           </div>
           <div className="hidden w-72 items-center gap-2 rounded-xl border bg-stone-50 px-3 py-2 md:flex">
             <Search size={16} className="text-stone-400" />

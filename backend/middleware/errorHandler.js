@@ -6,6 +6,6 @@ export function errorHandler(error, _req, res, _next) {
   console.error(error);
   res.status(error.status || 500).json({
     success: false,
-    message: error.message || "Internal server error",
+    message: (error.status && error.status < 500) || error.status === 503 || error.status === 502 ? error.message : "Unable to complete this request. Please try again.",
   });
 }

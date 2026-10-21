@@ -50,7 +50,7 @@ export function DashboardPage() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#7f1d1d]">
-              Lucky Varieties Beauty Mall
+              LGS Cosmetics
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
               Admin workspace

@@ -1,8 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, PageHero } from "@/components/commerce";
-import { mapsUrl, site, whatsappUrl } from "@/data/site";
+import { useSiteSettings } from "@/lib/general-settings";
 export const Route = createFileRoute("/contact")({
-  component: () => (
+  component: ContactPage,
+});
+
+function ContactPage() {
+  const { mapsUrl, site, whatsappUrl } = useSiteSettings();
+  return (
     <AppShell>
       <PageHero
         title="Visit Our Beauty Mall"
@@ -10,7 +15,7 @@ export const Route = createFileRoute("/contact")({
       />
       <section className="container-lv grid gap-8 py-14 lg:grid-cols-2">
         <div>
-          <h2 className="text-4xl text-wine">Lucky Varieties Beauty Mall</h2>
+          <h2 className="text-4xl text-wine">{site.name}</h2>
           <p className="mt-5 leading-8 text-muted-foreground">
             {site.address.line1}
             <br />
@@ -43,5 +48,5 @@ export const Route = createFileRoute("/contact")({
         </form>
       </section>
     </AppShell>
-  ),
-});
+  );
+}

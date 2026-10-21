@@ -1,6 +1,6 @@
 export const site = {
-  name: "Lucky Varieties Beauty Mall",
-  shortName: "Lucky Varieties",
+  name: "LGS Cosmetics",
+  shortName: "LGS Cosmetics",
   ownBrand: "LGS",
   tagline: "Skin and hair care for your skin",
   address: {
@@ -15,20 +15,20 @@ export const site = {
   instagramHandle: "@lgs_cosmetics",
   mapsLink: "https://share.google/YmYaSZZRk0ry1wlFN",
   mapsQuery:
-    "Lucky+Varieties+Beauty+Mall,+Koregaon-Rahimatpur+Road,+Near+Police+Station,+Koregaon,+Maharashtra+415501",
+    "LGS+Cosmetics,+Koregaon-Rahimatpur+Road,+Near+Police+Station,+Koregaon,+Maharashtra+415501",
 } as const;
 
 export const mapsUrl = site.mapsLink;
 export const mapsEmbedUrl = `https://www.google.com/maps?q=${site.mapsQuery}&output=embed`;
 export const whatsappUrl = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(
-  "Hello Lucky Varieties Beauty Mall, I would like to know more about your products.",
+  "Hello LGS Cosmetics, I would like to know more about your products.",
 )}`;
 
 export const announcements = [
   "Premium Beauty Products in Koregaon",
   "Retail & Wholesale Beauty Solutions",
-  "Visit Lucky Varieties Beauty Mall",
-  "Salon Equipment & Professional Beauty Products Available",
+  "Visit LGS Cosmetics",
+  "Skin and Hair Care for Your Everyday Routine",
 ];
 
 export function formatINR(value: number) {

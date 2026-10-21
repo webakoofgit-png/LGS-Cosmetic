@@ -25,7 +25,6 @@ dotenv.config({ path: path.resolve(__dirname, "../.env"), override: true });
 const blogCategories = [
   { name: "Skincare Tips", slug: "skincare-tips", description: "Routine and skin health advice." },
   { name: "Makeup Guides", slug: "makeup-guides", description: "Tutorials and beauty how-tos." },
-  { name: "Salon Care", slug: "salon-care", description: "Professional and wholesale insights." },
 ];
 
 const blogs = [

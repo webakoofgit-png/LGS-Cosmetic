@@ -4,7 +4,7 @@ import { AppShell, CheckoutPage } from "@/components/commerce";
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: "Secure Checkout | Lucky Varieties Beauty Mall" },
+      { title: "Secure Checkout | LGS Cosmetics" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

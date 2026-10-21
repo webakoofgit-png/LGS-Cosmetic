@@ -31,6 +31,7 @@ type ShopState = {
   setQty: (id: string, qty: number, shade?: string | undefined, variant?: string | undefined) => void;
   toggleWishlist: (product: Product) => void;
   isWishlisted: (id: string) => boolean;
+  clearCart: () => void;
   cartCount: number;
   subtotal: number;
   lines: { line: CartLine; product: Product }[];
@@ -143,11 +144,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const clearCart = useCallback(() => { localStorage.setItem(CART_KEY, "[]"); setCart([]); }, []);
+
   const value = useMemo<ShopState>(() => {
     const lines = cart
       .map((line) => ({ line, product: catalogProducts.find((p) => p.id === line.id)! }))
       .filter((l) => Boolean(l.product));
     return {
+      clearCart,
       adminProducts,
       catalogProducts,
       catalogError,
@@ -170,7 +174,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       }, 0),
       lines,
     };
-  }, [cart, wishlist, cartOpen, searchOpen, adminProducts, catalogProducts, catalogError, addToCart, removeFromCart, setQty, toggleWishlist]);
+  }, [cart, wishlist, cartOpen, searchOpen, adminProducts, catalogProducts, catalogError, addToCart, removeFromCart, setQty, toggleWishlist, clearCart]);
 
   return <ShopContext.Provider value={value}>{catalogReady ? children : <div className="grid min-h-screen place-items-center bg-[#f7f4ef] text-sm text-stone-500">Loading store...</div>}</ShopContext.Provider>;
 }

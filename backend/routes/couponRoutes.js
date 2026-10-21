@@ -1,13 +1,28 @@
 import { Router } from "express";
 import { Coupon } from "../models/index.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import { Op, col, where } from "sequelize";
 
 export const couponRoutes = Router();
+
+couponRoutes.get("/available", async (_req, res, next) => {
+  try {
+    const coupons = await Coupon.findAll({
+      attributes: ["code", "discountType", "discountValue", "minOrderAmount", "maxDiscount", "expiresAt"],
+      where: { status: "Active", [Op.and]: [
+        { [Op.or]: [{ expiresAt: null }, { expiresAt: { [Op.gte]: new Date() } }] },
+        { [Op.or]: [{ usageLimit: null }, where(col("used_count"), Op.lt, col("usage_limit"))] },
+      ] }, order: [["createdAt", "DESC"]],
+    });
+    res.json({ success: true, data: coupons });
+  } catch (error) { next(error); }
+});
 
 couponRoutes.get("/validate/:code", async (req, res, next) => {
   try {
     const code = String(req.params.code || "").trim().toUpperCase();
     const subtotal = Number(req.query.subtotal || 0);
+    if (!Number.isFinite(subtotal) || subtotal < 0) return res.status(400).json({ success: false, message: "Invalid order subtotal." });
     const coupon = await Coupon.findOne({ where: { code, status: "Active" } });
     if (!coupon) return res.status(404).json({ success: false, message: "Invalid or inactive coupon code." });
     if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) return res.status(400).json({ success: false, message: "This coupon has expired." });

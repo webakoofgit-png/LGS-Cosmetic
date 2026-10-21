@@ -23,6 +23,7 @@ export function getAdminProfile() {
 export function setAdminSession(token: string, profile: AdminProfile) {
   localStorage.setItem(ADMIN_TOKEN_KEY, token);
   localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(profile));
+  window.dispatchEvent(new Event("admin-session-updated"));
 }
 
 export function clearAdminSession() {

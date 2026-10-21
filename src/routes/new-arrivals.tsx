@@ -3,7 +3,7 @@ import { AppShell, CatalogPage } from "@/components/commerce";
 export const Route = createFileRoute("/new-arrivals")({
   component: () => (
     <AppShell>
-      <CatalogPage title="Just In" filter={(p) => p.tags.includes("new")} />
+      <CatalogPage title="New Arrivals" filter={(p) => p.tags.includes("new")} />
     </AppShell>
   ),
 });

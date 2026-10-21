@@ -70,7 +70,7 @@ const initialState: ProductFormState = {
 
 export const Route = createFileRoute("/admin/products/add")({
   validateSearch: (search: Record<string, unknown>) => ({
-    id: typeof search.id === "string" ? search.id : undefined,
+    id: typeof search["id"] === "string" ? search["id"] : undefined,
   }),
   beforeLoad: () => {
     if (typeof window !== "undefined" && !getAdminToken()) throw redirect({ to: "/admin/login" });
@@ -530,8 +530,8 @@ function parseVariantRows(value: unknown): VariantDraft[] {
     const raw = String(item?.size ?? item?.label ?? "").trim();
     const match = raw.match(/^(.*?)(?:\s+)(gm|kg|ml|l|oz|pcs)$/i);
     return {
-      size: match ? match[1] : raw,
-      unit: match ? match[2].toLowerCase() : "gm",
+      size: match ? (match[1] ?? raw) : raw,
+      unit: match ? (match[2] ?? "gm").toLowerCase() : "gm",
       price: item?.price == null ? "" : String(item.price),
       mrp: item?.mrp == null ? "" : String(item.mrp),
     };
